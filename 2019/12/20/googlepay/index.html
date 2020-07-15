@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/site32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://jiangfumei.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="撸代码前的准备工作 前阵子公司项目需要用到谷歌支付，开始接触的我懵懂摸索了一星期，终于和安卓对接好了谷歌支付。啥都不说了,直接上图： 1.进入Google Play Console ,https:&#x2F;&#x2F;play.google.com&#x2F;apps&#x2F;publish&#x2F;?account&#x3D;7344212024493937034#AppListPlace 2.设置-&gt;API访问-&gt;创建oauth2客户">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot接入Google Play">
+<meta property="og:url" content="https://jiangfumei.github.io/2019/12/20/googlepay/index.html">
+<meta property="og:site_name" content="Struggler&#39;s Blog">
+<meta property="og:description" content="撸代码前的准备工作 前阵子公司项目需要用到谷歌支付，开始接触的我懵懂摸索了一星期，终于和安卓对接好了谷歌支付。啥都不说了,直接上图： 1.进入Google Play Console ,https:&#x2F;&#x2F;play.google.com&#x2F;apps&#x2F;publish&#x2F;?account&#x3D;7344212024493937034#AppListPlace 2.设置-&gt;API访问-&gt;创建oauth2客户">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay01.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay02.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay03.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay04.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay05.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay07.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay08.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay09.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay10.png">
+<meta property="og:image" content="https://jiangfumei.github.io/images/googlepay11.png">
+<meta property="article:published_time" content="2019-12-20T02:59:54.000Z">
+<meta property="article:modified_time" content="2020-07-13T05:12:03.345Z">
+<meta property="article:author" content="jiangfumei">
+<meta property="article:tag" content="第三方">
+<meta property="article:tag" content="Google Play">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jiangfumei.github.io/images/googlepay01.png">
+
+<link rel="canonical" href="https://jiangfumei.github.io/2019/12/20/googlepay/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>SpringBoot接入Google Play | Struggler's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Struggler's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">随感随记</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">20</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">17</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">30</span></a>
+
+  </li>
+        <li class="menu-item menu-item-comments">
+
+    <a href="/comments/" rel="section"><i class="fa fa-fw fa-comments"></i>comments</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jiangfumei" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jiangfumei.github.io/2019/12/20/googlepay/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hade.jpg">
+      <meta itemprop="name" content="jiangfumei">
+      <meta itemprop="description" content="學無止境，氣有浩然">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Struggler's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringBoot接入Google Play<a href="https://github.com/user-name/repo-name/tree/branch-name/subdirectory-name_posts/googlepay.md" class="post-edit-link" title="编辑" rel="noopener" target="_blank"><i class="fa fa-pencil"></i></a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-20 10:59:54" itemprop="dateCreated datePublished" datetime="2019-12-20T10:59:54+08:00">2019-12-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-13 13:12:03" itemprop="dateModified" datetime="2020-07-13T13:12:03+08:00">2020-07-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%AC%E4%B8%89%E6%96%B9/" itemprop="url" rel="index">
+                    <span itemprop="name">第三方</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/12/20/googlepay/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/12/20/googlepay/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="撸代码前的准备工作">撸代码前的准备工作</h2>
+<p>前阵子公司项目需要用到谷歌支付，开始接触的我懵懂摸索了一星期，终于和安卓对接好了谷歌支付。啥都不说了,直接上图：<br>
+1.进入Google Play Console ,<a href="https://play.google.com/apps/publish/?account=7344212024493937034#AppListPlace" target="_blank" rel="noopener">https://play.google.com/apps/publish/?account=7344212024493937034#AppListPlace</a><br>
+2.设置-&gt;API访问-&gt;创建oauth2客户端-&gt;关联刚创建的项目</p>
+<a id="more"></a>
+<p><img src="/images/googlepay01.png" alt=""><br>
+3.可以创建服务账号<br>
+<img src="/images/googlepay02.png" alt=""><br>
+4.进入API和服务-&gt;设置认证信息和oauth2统一画面<br>
+<img src="/images/googlepay03.png" alt=""><br>
+认证信息<br>
+<img src="/images/googlepay04.png" alt=""><br>
+oauth2同意画面<br>
+<img src="/images/googlepay05.png" alt=""><br>
+<img src="/images/googlepay07.png" alt=""><br>
+5.可以点击项目选择创建oauth2客户端 或者服务帐号<br>
+<img src="/images/googlepay08.png" alt=""><br>
+6.下载oauth2客户端json或进入管理账户下载账户的secret.json或p12文件<br>
+<img src="/images/googlepay09.png" alt=""><br>
+基本的控制台设置流程就是这了，接下来再看代码部分：</p>
+<h2 id="代码部分">代码部分</h2>
+<p>1.先在application.yml配置google账号的信息，如下图<br>
+<img src="/images/googlepay10.png" alt=""><br>
+注意：服务器谷歌支付验证有两种方式：1请求googleapi验证 2.使用公密钥验证。在这里我使用的是第一种方式请求google api验证，第二种我也写了 但是不怎么好使<sup>_</sup>，在这里我也附上代码。。。<br>
+google配置类<code>GooglePayConfig.java</code>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xy.goone.config.pay;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.xy.goone.common.util.pay.GooglePayVerifyUtil;</span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.context.properties.ConfigurationProperties;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> fumei.jiang</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019-09-24 15:15</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@ConfigurationProperties</span>(prefix = <span class="string">"app.google.config"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GooglePayConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String keyFile;</span><br><span class="line">    <span class="keyword">private</span> String pkcs;</span><br><span class="line">    <span class="keyword">private</span> String serviceAccountEmail;</span><br><span class="line">    <span class="keyword">private</span> String client_id;</span><br><span class="line">    <span class="keyword">private</span> String client_secret;</span><br><span class="line">    <span class="keyword">private</span> String refresh_token;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getKeyFile</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> keyFile;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setKeyFile</span><span class="params">(String keyFile)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.keyFile = keyFile;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getPkcs</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> pkcs;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPkcs</span><span class="params">(String pkcs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.pkcs = pkcs;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getServiceAccountEmail</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> serviceAccountEmail;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServiceAccountEmail</span><span class="params">(String serviceAccountEmail)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.serviceAccountEmail = serviceAccountEmail;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getKeylongString</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> GooglePayVerifyUtil.load(<span class="keyword">this</span>.getKeyFile());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getPkcslongString</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> GooglePayVerifyUtil.load(<span class="keyword">this</span>.getPkcs());&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getClient_id</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> client_id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setClient_id</span><span class="params">(String client_id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.client_id = client_id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getClient_secret</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> client_secret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setClient_secret</span><span class="params">(String client_secret)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.client_secret = client_secret;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getRefresh_token</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> refresh_token;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setRefresh_token</span><span class="params">(String refresh_token)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.refresh_token = refresh_token;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>验证工具类<code>GooglePayVerifyUtil.java</code>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xy.goone.common.util.pay;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.commons.codec.binary.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStreamReader;</span><br><span class="line"><span class="keyword">import</span> java.security.KeyFactory;</span><br><span class="line"><span class="keyword">import</span> java.security.PublicKey;</span><br><span class="line"><span class="keyword">import</span> java.security.Signature;</span><br><span class="line"><span class="keyword">import</span> java.security.spec.X509EncodedKeySpec;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> fumei.jiang</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019-08-07 16:14</span></span><br><span class="line"><span class="comment"> * 谷歌支付</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GooglePayVerifyUtil</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*@Value(value = "$&#123;google.p12key&#125;")</span></span><br><span class="line"><span class="comment">    private String p12;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    @Value(value = "$&#123;google.email&#125;")</span></span><br><span class="line"><span class="comment">    private String email;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    @Value("$&#123;google.packageName&#125;")</span></span><br><span class="line"><span class="comment">    private String packageName;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    public static void main(String[] args) throws Exception &#123;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        PrivateKey privateKey = SecurityUtils.loadPrivateKeyFromKeyStore(</span></span><br><span class="line"><span class="comment">                SecurityUtils.getPkcs12KeyStore(),</span></span><br><span class="line"><span class="comment">                new FileInputStream(new File("&#123;P12 key file&#125;")), // 生成的P12文件</span></span><br><span class="line"><span class="comment">                "notasecret", "privatekey", "notasecret");</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        GoogleCredential credential = new GoogleCredential.Builder()</span></span><br><span class="line"><span class="comment">                .setTransport(transport).setJsonFactory(JacksonFactory.getDefaultInstance())</span></span><br><span class="line"><span class="comment">                .setServiceAccountId("&#123;Email address&#125;") // e.g.: 626891557797-frclnjv31rn4ss81ch746g9t6pd3mmej@developer.gserviceaccount.com</span></span><br><span class="line"><span class="comment">                .setServiceAccountScopes(AndroidPublisherScopes.all())</span></span><br><span class="line"><span class="comment">                .setServiceAccountPrivateKey(privateKey).build();</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        AndroidPublisher publisher = new AndroidPublisher.Builder(transport,</span></span><br><span class="line"><span class="comment">                JacksonFactory.getDefaultInstance(), credential).build();</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        AndroidPublisher.Purchases.Products products = publisher.purchases().products();</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        // 参数详细说明: https://developers.google.com/android-publisher/api-ref/purchases/products/get</span></span><br><span class="line"><span class="comment">        AndroidPublisher.Purchases.Products.Get product = products.get("&#123;packageName&#125;",</span></span><br><span class="line"><span class="comment">                "&#123;productId&#125;", "&#123;token&#125;");</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">        // 获取订单信息</span></span><br><span class="line"><span class="comment">        // 返回信息说明: https://developers.google.com/android-publisher/api-ref/purchases/products</span></span><br><span class="line"><span class="comment">        // 通过consumptionState, purchaseState可以判断订单的状态</span></span><br><span class="line"><span class="comment">        ProductPurchase purchase = product.execute();</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">docheck</span><span class="params">(String content, String sign, String publicKey)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        KeyFactory keyFactory = KeyFactory.getInstance(<span class="string">"RSA"</span>);</span><br><span class="line">        <span class="keyword">byte</span>[] encodedKey = Base64.decodeBase64(publicKey);</span><br><span class="line">        PublicKey pubKey = keyFactory.generatePublic(<span class="keyword">new</span> X509EncodedKeySpec(encodedKey));</span><br><span class="line">        Signature signature = Signature.getInstance(<span class="string">"SHA1WithRSA"</span>);</span><br><span class="line">        signature.initVerify(pubKey);</span><br><span class="line">        signature.update(content.getBytes(<span class="string">"utf-8"</span>));</span><br><span class="line">        <span class="keyword">return</span> signature.verify(Base64.decodeBase64(sign));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String PRIVATE_KEYS;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> String <span class="title">load</span><span class="params">(String file)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (PRIVATE_KEYS == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!file.startsWith(<span class="string">"/"</span>)) &#123;</span><br><span class="line">                file = GooglePayVerifyUtil.class.getResource("/").getFile() + File.separator + file;</span><br><span class="line">            &#125;</span><br><span class="line">            File f = <span class="keyword">new</span> File(file);</span><br><span class="line">            <span class="keyword">try</span> (InputStreamReader reader = <span class="keyword">new</span> InputStreamReader(<span class="keyword">new</span> FileInputStream(f), <span class="string">"utf8"</span>);) &#123;</span><br><span class="line">                StringBuffer buffer = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">                <span class="keyword">char</span>[] bf = <span class="keyword">new</span> <span class="keyword">char</span>[<span class="number">1024</span>];</span><br><span class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                    <span class="keyword">int</span> size = reader.read(bf);</span><br><span class="line">                    <span class="keyword">if</span> (size &lt; <span class="number">0</span>)</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    buffer.append(bf, <span class="number">0</span>, size);</span><br><span class="line">                &#125;</span><br><span class="line">                PRIVATE_KEYS = buffer.toString();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"read file error ! "</span> + f.getAbsolutePath(), e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> PRIVATE_KEYS;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>OrderController.java</code>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, String&gt; cacheToken = <span class="keyword">null</span>;<span class="comment">//设置静态变量，用于判断access_token是否过期</span></span><br><span class="line"> <span class="meta">@Authorization</span></span><br><span class="line"> <span class="meta">@PostMapping</span>(value = <span class="string">"/createOrder"</span>)</span><br><span class="line"> <span class="meta">@ApiOperation</span>(value = <span class="string">"创建本地订单"</span>)</span><br><span class="line"> <span class="function"><span class="keyword">public</span> Result&lt;Object&gt; <span class="title">createOrder</span><span class="params">(@RequestBody Order order, @CurrentUser User user)</span> </span>&#123;</span><br><span class="line">     Order sysOrder = <span class="keyword">new</span> Order();</span><br><span class="line">     sysOrder.setQuantity(order.getQuantity());</span><br><span class="line">     sysOrder.setPayType(order.getPayType());</span><br><span class="line">     sysOrder.setMoney(order.getMoney());</span><br><span class="line">     sysOrder.setType(order.getType());</span><br><span class="line">     sysOrder.setUser(user);</span><br><span class="line">     sysOrder.setStatus(Constant.PAY_FAILURE);</span><br><span class="line">     String no = String.valueOf(System.currentTimeMillis());<span class="comment">//订单号</span></span><br><span class="line">     sysOrder.setNo(no + RandomUtil.getRandomNum());<span class="comment">//时间戳+随机六位数</span></span><br><span class="line">     orderRepository.save(sysOrder);</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">new</span> ResultUtil&lt;&gt;().setData(sysOrder.getNo());</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="meta">@RequestMapping</span>(value = <span class="string">"/googlePayVerify"</span>, method = RequestMethod.POST)</span><br><span class="line"> <span class="meta">@ApiOperation</span>(value = <span class="string">"谷歌支付方式二：通过请求谷歌api验证"</span>)</span><br><span class="line"> <span class="meta">@Authorization</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> Result&lt;Object&gt; <span class="title">googlePlayVerify</span><span class="params">(@RequestBody Pay.Payment payment, @CurrentUser User user)</span> </span>&#123;</span><br><span class="line">     String no = payment.getNo();</span><br><span class="line">     <span class="keyword">int</span> type = payment.getType();<span class="comment">//类型：0 消耗 1购买</span></span><br><span class="line">     Pay.Purchase receipt = payment.getPurchase();</span><br><span class="line">     <span class="comment">//先校对与本地订单</span></span><br><span class="line">     Order localOrder = orderRepository.findByNo(no);<span class="comment">//禁止重复刷单</span></span><br><span class="line">     log.info(<span class="string">"no is &#123;&#125;"</span>, no);</span><br><span class="line">     <span class="keyword">if</span> (localOrder == <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">new</span> ResultUtil&lt;&gt;().setErrorMsg(<span class="keyword">this</span>.i18n(<span class="string">"order.does.not.exist.and.recharge.failed"</span>));</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">if</span> (localOrder.getStatus() == Constant.PAY_SUCCESS) &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="keyword">new</span> ResultUtil&lt;&gt;().setErrorMsg(<span class="keyword">this</span>.i18n(<span class="string">"this.order.has.been.successfully.recharged.and.cannot.be.refilled"</span>));</span><br><span class="line">     &#125;</span><br><span class="line">     JSONObject jsonObject = <span class="keyword">null</span>;</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         String json = JsonUtil.objectToJson(receipt);</span><br><span class="line">         log.info(<span class="string">"param  purchase json is &#123;&#125;"</span>, json);</span><br><span class="line">         jsonObject = JSON.parseObject(json);</span><br><span class="line">     &#125; <span class="keyword">catch</span> (JSONException e) &#123;</span><br><span class="line">         <span class="keyword">throw</span> HttpRequestException.newI18N(<span class="string">"data.parsing.failed"</span>);<span class="comment">//数据解析失败</span></span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">if</span> (<span class="keyword">null</span> != cacheToken) &#123;</span><br><span class="line">         Long expires_in = Long.valueOf(cacheToken.get(<span class="string">"expires_in"</span>)); <span class="comment">// 有效时长</span></span><br><span class="line">         Long create_time = Long.valueOf(cacheToken.get(<span class="string">"create_time"</span>)); <span class="comment">// access_token的创建时间</span></span><br><span class="line">         Long now_time = (<span class="keyword">new</span> Date().getTime()) / <span class="number">1000</span>;</span><br><span class="line">         <span class="keyword">if</span> (now_time &gt; (create_time + expires_in - <span class="number">300</span>)) &#123; <span class="comment">// 提前五分钟重新获取access_token</span></span><br><span class="line">             cacheToken = getAccessToken();</span><br><span class="line">         &#125;</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         cacheToken = getAccessToken();</span><br><span class="line">     &#125;</span><br><span class="line">     String access_token = cacheToken.get(<span class="string">"access_token"</span>);</span><br><span class="line">     String productId = jsonObject.getString(<span class="string">"productId"</span>);</span><br><span class="line">     String packageName = jsonObject.getString(<span class="string">"packageName"</span>);</span><br><span class="line">     String purchaseToken = jsonObject.getString(<span class="string">"purchaseToken"</span>);</span><br><span class="line">     <span class="keyword">int</span> purchaseState = jsonObject.getIntValue(<span class="string">"purchaseState"</span>);</span><br><span class="line">     <span class="keyword">long</span> purchaseTime = jsonObject.getLongValue(<span class="string">"purchaseTime"</span>);</span><br><span class="line">     String orderId = jsonObject.getString(<span class="string">"orderId"</span>);</span><br><span class="line">     log.info(<span class="string">"access_token:&#123;&#125;,productId:&#123;&#125;,packageName:&#123;&#125;,purchaseToken:&#123;&#125;,purchaseState:&#123;&#125;,orderId:&#123;&#125;"</span>, access_token, productId, packageName, purchaseToken, purchaseState, orderId);</span><br><span class="line">     GooglePayment googlePayment = googlePaymentService.save(no, orderId, access_token, productId, packageName, purchaseToken, purchaseState, user, purchaseTime);</span><br><span class="line">     Order go = orderRepository.findByTransactionId(orderId);</span><br><span class="line">     <span class="keyword">if</span> (go != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="keyword">throw</span> HttpRequestException.newI18N(<span class="string">"this.order.has.been.successfully.recharged.and.cannot.be.refilled"</span>);</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="keyword">final</span> String client_id = googlePayConfig.getClient_id();</span><br><span class="line">         <span class="keyword">final</span> String client_secret = googlePayConfig.getClient_secret();</span><br><span class="line">         <span class="keyword">final</span> String refresh_token = googlePayConfig.getRefresh_token();</span><br><span class="line">         HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();</span><br><span class="line">         TokenResponse tokenResponse = <span class="keyword">new</span> TokenResponse();</span><br><span class="line">         tokenResponse.setAccessToken(access_token);</span><br><span class="line">         tokenResponse.setRefreshToken(refresh_token);</span><br><span class="line">         tokenResponse.setExpiresInSeconds(<span class="number">3600L</span>);</span><br><span class="line">         tokenResponse.setTokenType(<span class="string">"Bearer"</span>);</span><br><span class="line">         GoogleCredential credential = <span class="keyword">new</span> GoogleCredential.Builder()</span><br><span class="line">                 .setTransport(transport)</span><br><span class="line">                 .setJsonFactory(JacksonFactory.getDefaultInstance())</span><br><span class="line">                 .setClientSecrets(client_id, client_secret)</span><br><span class="line">                 .build()</span><br><span class="line">                 .setFromTokenResponse(tokenResponse);</span><br><span class="line">         AndroidPublisher publisher = <span class="keyword">new</span> AndroidPublisher.Builder(transport, JacksonFactory.getDefaultInstance(), credential).setApplicationName(packageName).build();</span><br><span class="line">         <span class="keyword">if</span> (type == <span class="number">1</span>) &#123;<span class="comment">//订阅型</span></span><br><span class="line">             <span class="comment">//谷歌订阅周期为一个月续订 测试账号对应时间为5分钟 且测试账号最多可连续订阅6次</span></span><br><span class="line">             <span class="keyword">return</span> googleSubscribe(user, type, localOrder, productId, packageName, purchaseToken, orderId, publisher, googlePayment);</span><br><span class="line"></span><br><span class="line">         &#125;</span><br><span class="line">         AndroidPublisher.Purchases.Products products = publisher.purchases().products();</span><br><span class="line">         AndroidPublisher.Purchases.Products.Get product = products.get(packageName, productId, purchaseToken);<span class="comment">//消耗型验证</span></span><br><span class="line">         log.info(<span class="string">"product,packageName:&#123;&#125;,productId:&#123;&#125;,token:&#123;&#125;"</span>, product.getPackageName(), product.getProductId(), product.getToken());</span><br><span class="line">         ProductPurchase purchase = product.execute();</span><br><span class="line">         log.info(<span class="string">"purchase:&#123;&#125;"</span>, purchase);</span><br><span class="line">         <span class="keyword">if</span> (purchase.getPurchaseState() == <span class="number">0</span>) &#123;<span class="comment">//确认状态为已购买状态</span></span><br><span class="line">             <span class="comment">//POST https://www.googleapis.com/androidpublisher/v3/applications/packageName/purchases/products/productId/tokens/token:acknowledge</span></span><br><span class="line">             Product pro = productService.getByProductId(productId).orElseThrow(() -&gt; &#123;</span><br><span class="line">                 <span class="keyword">return</span> HttpRequestException.newI18N(<span class="string">"not.find.product"</span>);</span><br><span class="line">             &#125;);</span><br><span class="line">             <span class="keyword">int</span> amount = pro.getAmount();</span><br><span class="line">             <span class="keyword">int</span> coin = user.getCoin() + amount;</span><br><span class="line">             user.setCoin(coin);</span><br><span class="line">             userService.updateUser(user);<span class="comment">//更新用户coin</span></span><br><span class="line">             log.info(<span class="string">"产品的确认状态:&#123;&#125;"</span>, purchase.getAcknowledgementState());</span><br><span class="line">             <span class="keyword">if</span> (purchase.getAcknowledgementState() == <span class="number">0</span>) &#123;<span class="comment">//尚未得到确认</span></span><br><span class="line">                 ProductPurchasesAcknowledgeRequest productPurchasesAcknowledgeRequest = <span class="keyword">new</span> ProductPurchasesAcknowledgeRequest();</span><br><span class="line">                 productPurchasesAcknowledgeRequest.setDeveloperPayload(purchase.getDeveloperPayload());</span><br><span class="line">                 AndroidPublisher.Purchases.Products.Acknowledge acknowledge = products.acknowledge(packageName, productId, purchaseToken, productPurchasesAcknowledgeRequest);</span><br><span class="line">                 acknowledge.execute();</span><br><span class="line">             &#125;</span><br><span class="line">             localOrder.setTransactionId(orderId);</span><br><span class="line">             localOrder.setStatus(Constant.PAY_SUCCESS);</span><br><span class="line">             localOrder.setProduct(pro);</span><br><span class="line">             localOrder.setQuantity(pro.getAmount());</span><br><span class="line">             localOrder.setType(type);<span class="comment">//消耗型</span></span><br><span class="line">             orderService.updateOrder(localOrder);</span><br><span class="line">             billRecordService.save(amount, <span class="number">1</span>, <span class="string">"ポイント購入"</span>, user);</span><br><span class="line">             googlePayment.setAcknowledged(<span class="number">1</span>);</span><br><span class="line">             googlePaymentService.update(googlePayment, pro, GooglePayment.Type.Consume);</span><br><span class="line">             <span class="keyword">return</span> <span class="keyword">new</span> ResultUtil&lt;&gt;().setData(coin);</span><br><span class="line">         &#125;</span><br><span class="line">     &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">         log.error(<span class="string">"exception is &#123;&#125;"</span>, e.getMessage());</span><br><span class="line">         <span class="keyword">throw</span> HttpRequestException.newI18N(<span class="string">"order.verification"</span>);</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">new</span> ResultUtil&lt;&gt;().setErrorMsg(<span class="keyword">this</span>.i18n(<span class="string">"order.verification"</span>));</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">private</span> Result&lt;Object&gt; <span class="title">googleSubscribe</span><span class="params">(@CurrentUser User user, <span class="keyword">int</span> type, Order localOrder, String productId, String packageName, String purchaseToken, String orderId, AndroidPublisher publisher, GooglePayment googlePayment)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">     log.info(<span class="string">"订阅验证开始......"</span>);</span><br><span class="line">     AndroidPublisher.Purchases.Subscriptions subscriptions = publisher.purchases().subscriptions();</span><br><span class="line">     AndroidPublisher.Purchases.Subscriptions.Get subscription = subscriptions.get(packageName, productId, purchaseToken);</span><br><span class="line">     SubscriptionPurchase subscriptionPurchase = subscription.execute();</span><br><span class="line">     log.info(<span class="string">"subscriptionPurchase:&#123;&#125;"</span>, subscriptionPurchase);</span><br><span class="line">     <span class="keyword">long</span> expiryTimeMillis = subscriptionPurchase.getExpiryTimeMillis();<span class="comment">//订阅到期的时间</span></span><br><span class="line">     <span class="keyword">long</span> startTimeMillis = subscriptionPurchase.getStartTimeMillis();<span class="comment">//授予订阅的时间</span></span><br><span class="line">     <span class="keyword">boolean</span> autoRenewing = subscriptionPurchase.getAutoRenewing();<span class="comment">//订阅在达到其当前到期时间时是否将自动续订。</span></span><br><span class="line">     <span class="keyword">int</span> paymentState = subscriptionPurchase.getPaymentState();<span class="comment">//订阅的付款状态： 0付款等待中 1已收到付款 2免费试用 3待推迟的升级</span></span><br><span class="line">     log.info(<span class="string">"expiryTimeMillis : &#123;&#125;,startTimeMillis : &#123;&#125;,autoRenewing : &#123;&#125;,paymentState : &#123;&#125;,productId:&#123;&#125;,acknowledgementState:&#123;&#125;"</span>, expiryTimeMillis, startTimeMillis, autoRenewing, paymentState, productId, subscriptionPurchase.getAcknowledgementState());</span><br><span class="line">     Product pro = productService.getByProductId(productId).orElseThrow(() -&gt; &#123;</span><br><span class="line">         <span class="keyword">return</span> HttpRequestException.newI18N(<span class="string">"not.find.product"</span>);</span><br><span class="line">     &#125;);</span><br><span class="line">     user.setJoinTime(<span class="keyword">new</span> Date(startTimeMillis));<span class="comment">//会员订阅时间</span></span><br><span class="line">     user.setExpireTime(<span class="keyword">new</span> Date(expiryTimeMillis));<span class="comment">//会员到期时间</span></span><br><span class="line">     <span class="keyword">if</span> (paymentState == <span class="number">1</span> || paymentState == <span class="number">2</span>) &#123;<span class="comment">//付款状态或者是处于试用期  1已收到付款  2免费试用</span></span><br><span class="line">         user.setType(<span class="number">1</span>);<span class="comment">//强者会员</span></span><br><span class="line">     &#125;</span><br><span class="line">     userService.updateUser(user);</span><br><span class="line">     log.info(<span class="string">"joinTime is&#123;&#125;,expireTime is &#123;&#125;"</span>, user.getJoinTime(), user.getExpireTime());</span><br><span class="line">     <span class="keyword">if</span> (subscriptionPurchase.getAcknowledgementState() == <span class="number">0</span>) &#123;<span class="comment">//尚未得到确认</span></span><br><span class="line">         log.info(<span class="string">"确认订阅订单。。。。"</span>);</span><br><span class="line">         SubscriptionPurchasesAcknowledgeRequest subAckRe = <span class="keyword">new</span> SubscriptionPurchasesAcknowledgeRequest();</span><br><span class="line">         subAckRe.setDeveloperPayload(subscriptionPurchase.getDeveloperPayload());</span><br><span class="line">         AndroidPublisher.Purchases.Subscriptions.Acknowledge subAck = subscriptions.acknowledge(packageName, productId, purchaseToken, subAckRe);</span><br><span class="line">         subAck.execute();</span><br><span class="line">     &#125;</span><br><span class="line">     localOrder.setTransactionId(orderId);</span><br><span class="line">     localOrder.setStatus(<span class="number">1</span>);</span><br><span class="line">     localOrder.setProduct(pro);</span><br><span class="line">     localOrder.setType(type);<span class="comment">//订阅</span></span><br><span class="line">     orderService.updateOrder(localOrder);</span><br><span class="line">     googlePayment.setAcknowledged(<span class="number">1</span>);</span><br><span class="line">     googlePayment.setPurchaseTime(<span class="keyword">new</span> Date(startTimeMillis));</span><br><span class="line">     googlePayment.setExpiresDate(<span class="keyword">new</span> Date(expiryTimeMillis));</span><br><span class="line">     googlePaymentService.update(googlePayment, pro, GooglePayment.Type.SubScribe);</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">new</span> ResultUtil&lt;&gt;().setSuccessMsg(<span class="keyword">this</span>.i18n(<span class="string">"successfully"</span>));</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="meta">@RequestMapping</span>(value = <span class="string">"/googleCancel"</span>, method = RequestMethod.POST)</span><br><span class="line"> <span class="meta">@ApiOperation</span>(value = <span class="string">"/取消订阅"</span>)</span><br><span class="line"> <span class="meta">@Authorization</span></span><br><span class="line"> <span class="function"><span class="keyword">public</span> Result&lt;Object&gt; <span class="title">cancel</span><span class="params">(@RequestBody Pay.Purchase cancel, @CurrentUser User user)</span> </span>&#123;</span><br><span class="line">     String packageName = cancel.getPackageName();</span><br><span class="line">     String productId = cancel.getProductId();</span><br><span class="line">     String purchaseToken = cancel.getPurchaseToken();</span><br><span class="line">     log.info(<span class="string">"谷歌取消订阅传参,packageName is &#123;&#125;,productId is &#123;&#125;,purchaseToken is &#123;&#125;"</span>, packageName, productId, purchaseToken);</span><br><span class="line">     <span class="keyword">if</span> (<span class="keyword">null</span> != cacheToken) &#123;</span><br><span class="line">         Long expires_in = Long.valueOf(cacheToken.get(<span class="string">"expires_in"</span>)); <span class="comment">// 有效时长</span></span><br><span class="line">         Long create_time = Long.valueOf(cacheToken.get(<span class="string">"create_time"</span>)); <span class="comment">// access_token的创建时间</span></span><br><span class="line">         Long now_time = (<span class="keyword">new</span> Date().getTime()) / <span class="number">1000</span>;</span><br><span class="line">         <span class="keyword">if</span> (now_time &gt; (create_time + expires_in - <span class="number">300</span>)) &#123; <span class="comment">// 提前五分钟重新获取access_token</span></span><br><span class="line">             cacheToken = getAccessToken();</span><br><span class="line">         &#125;</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         cacheToken = getAccessToken();</span><br><span class="line">     &#125;</span><br><span class="line">     String access_token = cacheToken.get(<span class="string">"access_token"</span>);</span><br><span class="line">     log.info(<span class="string">"accessToken is &#123;&#125;"</span>, access_token);</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="keyword">final</span> String client_id = googlePayConfig.getClient_id();</span><br><span class="line">         <span class="keyword">final</span> String client_secret = googlePayConfig.getClient_secret();</span><br><span class="line">         <span class="keyword">final</span> String refresh_token = googlePayConfig.getRefresh_token();</span><br><span class="line">         HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();</span><br><span class="line">         TokenResponse tokenResponse = <span class="keyword">new</span> TokenResponse();</span><br><span class="line">         tokenResponse.setAccessToken(access_token);</span><br><span class="line">         tokenResponse.setRefreshToken(refresh_token);</span><br><span class="line">         tokenResponse.setExpiresInSeconds(<span class="number">3600L</span>);</span><br><span class="line">         tokenResponse.setTokenType(<span class="string">"Bearer"</span>);</span><br><span class="line">         GoogleCredential credential = <span class="keyword">new</span> GoogleCredential.Builder()</span><br><span class="line">                 .setTransport(transport)</span><br><span class="line">                 .setJsonFactory(JacksonFactory.getDefaultInstance())</span><br><span class="line">                 .setClientSecrets(client_id, client_secret)</span><br><span class="line">                 .build()</span><br><span class="line">                 .setFromTokenResponse(tokenResponse);</span><br><span class="line">         AndroidPublisher publisher = <span class="keyword">new</span> AndroidPublisher.Builder(transport, JacksonFactory.getDefaultInstance(), credential).setApplicationName(packageName).build();</span><br><span class="line"></span><br><span class="line">         AndroidPublisher.Purchases.Subscriptions subscriptions = publisher.purchases().subscriptions();</span><br><span class="line">         AndroidPublisher.Purchases.Subscriptions.Get subscription = subscriptions.get(packageName, productId, purchaseToken);</span><br><span class="line">         SubscriptionPurchase subscriptionPurchase = subscription.execute();</span><br><span class="line">         log.info(<span class="string">"取消订阅的的订阅信息为&#123;&#125;"</span>, subscriptionPurchase);</span><br><span class="line">         SubscriptionPurchasesAcknowledgeRequest subAckRe = <span class="keyword">new</span> SubscriptionPurchasesAcknowledgeRequest();</span><br><span class="line">         subAckRe.setDeveloperPayload(subscriptionPurchase.getDeveloperPayload());</span><br><span class="line">         AndroidPublisher.Purchases.Subscriptions.Cancel cancelSub = subscriptions.cancel(packageName, productId, purchaseToken);</span><br><span class="line">         cancelSub.execute();</span><br><span class="line">         log.info(<span class="string">"取消谷歌订阅成功"</span>);</span><br><span class="line">     &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">         log.error(<span class="string">"exception is &#123;&#125;"</span>, e.getMessage());</span><br><span class="line">         <span class="keyword">throw</span> HttpRequestException.newI18N(<span class="string">"order.verification"</span>);</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> ResultUtil.success(<span class="keyword">this</span>.i18n(<span class="string">"successfully"</span>));</span><br><span class="line"></span><br><span class="line"> &#125;</span><br><span class="line"> <span class="comment">/*   @RequestMapping(value = "/googlePay", method = RequestMethod.POST)</span></span><br><span class="line"><span class="comment">    @ApiOperation(value = "谷歌支付方式二：通过请求谷歌api验证")</span></span><br><span class="line"><span class="comment">    @Authorization</span></span><br><span class="line"><span class="comment">    public Result&lt;Object&gt; googlePlay(@RequestBody Pay.Payment payment, @CurrentUser User user) &#123;</span></span><br><span class="line"><span class="comment">        String no = payment.getNo();</span></span><br><span class="line"><span class="comment">        Pay.Purchase receipt = payment.getPurchase();</span></span><br><span class="line"><span class="comment">        //先校对与本地订单</span></span><br><span class="line"><span class="comment">        Order localOrder = orderRepository.findByNo(no);//禁止重复刷单</span></span><br><span class="line"><span class="comment">        if (localOrder == null) &#123;</span></span><br><span class="line"><span class="comment">            return new ResultUtil&lt;&gt;().setErrorMsg(this.i18n("order.does.not.exist.and.recharge.failed"));</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">        JSONObject jsonObject = null;</span></span><br><span class="line"><span class="comment">        try &#123;</span></span><br><span class="line"><span class="comment">            String json = JsonUtil.objectToJson(receipt);</span></span><br><span class="line"><span class="comment">            jsonObject = JSON.parseObject(json);</span></span><br><span class="line"><span class="comment">        &#125; catch (JSONException e) &#123;</span></span><br><span class="line"><span class="comment">            throw new HttpRequestException(HttpServletResponse.SC_NOT_ACCEPTABLE, this.i18n("data.parsing.failed"));//数据解析失败</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">        String productId = jsonObject.getString("productId");</span></span><br><span class="line"><span class="comment">        String packageName = jsonObject.getString("packageName");</span></span><br><span class="line"><span class="comment">        String purchaseToken = jsonObject.getString("purchaseToken");</span></span><br><span class="line"><span class="comment">        int purchaseState = jsonObject.getIntValue("purchaseState");</span></span><br><span class="line"><span class="comment">        String orderId = jsonObject.getString("orderId");</span></span><br><span class="line"><span class="comment">        log.info("productId:&#123;&#125;,packageName:&#123;&#125;,purchaseToken:&#123;&#125;,purchaseState:&#123;&#125;,orderId:&#123;&#125;",productId,packageName,purchaseToken,purchaseState,orderId);</span></span><br><span class="line"><span class="comment">        Order go = orderRepository.findByTransactionId(orderId);</span></span><br><span class="line"><span class="comment">        if (go!=null)&#123;</span></span><br><span class="line"><span class="comment">            throw new HttpRequestException(HttpServletResponse.SC_NOT_ACCEPTABLE,this.i18n("this.order.has.been.successfully.recharged.and.cannot.be.refilled"));</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">        try &#123;</span></span><br><span class="line"><span class="comment">            File file = ResourceUtils.getFile("classpath:/googlePlayKey/rizin_p12.p12");</span></span><br><span class="line"><span class="comment">            HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();</span></span><br><span class="line"><span class="comment">            PrivateKey privateKey = SecurityUtils.loadPrivateKeyFromKeyStore(</span></span><br><span class="line"><span class="comment">                    SecurityUtils.getPkcs12KeyStore(),</span></span><br><span class="line"><span class="comment">                    new FileInputStream(file), // 生成的P12文件</span></span><br><span class="line"><span class="comment">                    "notasecret", "privatekey", "notasecret");</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">            GoogleCredential credential = new GoogleCredential.Builder()</span></span><br><span class="line"><span class="comment">                    .setTransport(transport).setJsonFactory(JacksonFactory.getDefaultInstance())</span></span><br><span class="line"><span class="comment">                    .setServiceAccountId(googlePayConfig.getServiceAccountEmail()) // e.g.: 626891557797-frclnjv31rn4ss81ch746g9t6pd3mmej@developer.gserviceaccount.com</span></span><br><span class="line"><span class="comment">                    .setServiceAccountScopes(AndroidPublisherScopes.all())</span></span><br><span class="line"><span class="comment">                    .setServiceAccountPrivateKey(privateKey).build();</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">            AndroidPublisher publisher = new AndroidPublisher.Builder(transport,</span></span><br><span class="line"><span class="comment">                    JacksonFactory.getDefaultInstance(), credential).build();</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">            AndroidPublisher.Purchases.Products products = publisher.purchases().products();</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">            // 参数详细说明: https://developers.google.com/android-publisher/api-ref/purchases/products/get</span></span><br><span class="line"><span class="comment">            AndroidPublisher.Purchases.Products.Get product = products.get(packageName,</span></span><br><span class="line"><span class="comment">                    productId, purchaseToken);</span></span><br><span class="line"><span class="comment">            log.info("credential:&#123;&#125;,publisher:&#123;&#125;,products:&#123;&#125;,product:&#123;&#125;",credential,publisher,products,product);</span></span><br><span class="line"><span class="comment">            // 获取订单信息</span></span><br><span class="line"><span class="comment">            // 返回信息说明: https://developers.google.com/android-publisher/api-ref/purchases/products</span></span><br><span class="line"><span class="comment">            // 通过consumptionState, purchaseState可以判断订单的状态</span></span><br><span class="line"><span class="comment">            ProductPurchase purchase = product.execute();</span></span><br><span class="line"><span class="comment">            log.info("purchaseis : &#123;&#125;",purchase);</span></span><br><span class="line"><span class="comment">            if (purchase.getPurchaseState()==0) &#123;</span></span><br><span class="line"><span class="comment">                Product pro = productService.getByProductId(productId);</span></span><br><span class="line"><span class="comment">                int amount = pro.getAmount();</span></span><br><span class="line"><span class="comment">                BigDecimal price = pro.getPrice();</span></span><br><span class="line"><span class="comment">                int coin = user.getCoin() + amount;</span></span><br><span class="line"><span class="comment">                user.setCoin(coin);</span></span><br><span class="line"><span class="comment">                userService.updateUser(user);//更新用户coin</span></span><br><span class="line"><span class="comment">                localOrder.setTransactionId(orderId);</span></span><br><span class="line"><span class="comment">                localOrder.setStatus(1);</span></span><br><span class="line"><span class="comment">                //todo::充值类型是消耗型还是订阅型 type赋值</span></span><br><span class="line"><span class="comment">                localOrder.setProductId(pro.getId());</span></span><br><span class="line"><span class="comment">                orderService.updateOrder(localOrder);</span></span><br><span class="line"><span class="comment">                return new ResultUtil&lt;&gt;().setData(coin);</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">            &#125;</span></span><br><span class="line"><span class="comment">        &#125; catch (Exception e) &#123;</span></span><br><span class="line"><span class="comment">            throw new HttpRequestException(HttpServletResponse.SC_NOT_ACCEPTABLE, this.i18n("order.verification"));</span></span><br><span class="line"><span class="comment">        &#125;</span></span><br><span class="line"><span class="comment">        return new ResultUtil&lt;&gt;().setErrorMsg(this.i18n("order.verification"));</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"> <span class="function"><span class="keyword">private</span> Map&lt;String, String&gt; <span class="title">getAccessToken</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     String client_id = googlePayConfig.getClient_id();</span><br><span class="line">     String client_secret = googlePayConfig.getClient_secret();</span><br><span class="line">     String refresh_token = googlePayConfig.getRefresh_token();</span><br><span class="line">     Map&lt;String, String&gt; headers = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">     Map&lt;String, String&gt; querys = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">     Map&lt;String, String&gt; map = <span class="keyword">null</span>;</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">// HTTP 获取access_token</span></span><br><span class="line">         String url = <span class="string">"https://accounts.google.com/o/oauth2/token"</span>;</span><br><span class="line">         headers.put(<span class="string">"Content-Type"</span>, <span class="string">"application/x-www-form-urlencoded; charset=utf-8"</span>);</span><br><span class="line">         headers.put(<span class="string">"Accept"</span>, <span class="string">"text/plain;charset=utf-8"</span>);</span><br><span class="line">         querys.put(<span class="string">"grant_type"</span>, <span class="string">"refresh_token"</span>);</span><br><span class="line">         querys.put(<span class="string">"client_id"</span>, client_id);</span><br><span class="line">         querys.put(<span class="string">"client_secret"</span>, client_secret);</span><br><span class="line">         querys.put(<span class="string">"refresh_token"</span>, refresh_token);</span><br><span class="line">         String googleAccessToken = HttpUtils.send(url, headers, querys, <span class="string">"UTF-8"</span>);</span><br><span class="line">         JSONObject tokenObject = JSON.parseObject(googleAccessToken);</span><br><span class="line">         String access_token = tokenObject.getString(<span class="string">"access_token"</span>);</span><br><span class="line">         Long expires_in = tokenObject.getLong(<span class="string">"expires_in"</span>);</span><br><span class="line">         map = <span class="keyword">new</span> HashMap&lt;String, String&gt;();</span><br><span class="line">         map.put(<span class="string">"access_token"</span>, access_token);</span><br><span class="line">         map.put(<span class="string">"expires_in"</span>, String.valueOf(expires_in));</span><br><span class="line">         <span class="comment">// 带入access_token的创建时间，用于之后判断是否失效</span></span><br><span class="line">         map.put(<span class="string">"create_time"</span>, String.valueOf((<span class="keyword">new</span> Date().getTime()) / <span class="number">1000</span>));</span><br><span class="line">         log.info(<span class="string">"包含access_token的JSON信息为: &#123;&#125;"</span>, tokenObject);</span><br><span class="line">     &#125; <span class="keyword">catch</span> (MalformedURLException e) &#123;</span><br><span class="line">         log.error(<span class="string">"获取access_token失败,原因是:&#123;&#125;"</span>, e);</span><br><span class="line">         e.printStackTrace();</span><br><span class="line">     &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">         log.error(<span class="string">"获取access_token失败,原因是:&#123;&#125;"</span>, e);</span><br><span class="line">         e.printStackTrace();</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> map;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p><code>Pay.java</code>:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xy.goone.modules.model;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> fumei.jiang</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019-12-05 16:05</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Pay</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Payment</span></span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> type;<span class="comment">//类型：0消耗 1订阅</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> String no;<span class="comment">//本地订单号</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> Purchase purchase;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Payment</span><span class="params">(<span class="keyword">int</span> type, String no, Purchase purchase)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.type = type;</span><br><span class="line">            <span class="keyword">this</span>.no = no;</span><br><span class="line">            <span class="keyword">this</span>.purchase = purchase;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> type;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setType</span><span class="params">(<span class="keyword">int</span> type)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.type = type;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getNo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> no;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNo</span><span class="params">(String no)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.no = no;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Purchase <span class="title">getPurchase</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> purchase;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPurchase</span><span class="params">(Purchase purchase)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.purchase = purchase;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">     <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Purchase</span> </span>&#123;</span><br><span class="line">         <span class="keyword">private</span> String productId;</span><br><span class="line">         <span class="keyword">private</span> String purchaseToken;</span><br><span class="line">         <span class="keyword">private</span> String purchaseState;</span><br><span class="line">         <span class="keyword">private</span> String packageName;</span><br><span class="line">         <span class="keyword">private</span> String orderId;</span><br><span class="line">         <span class="keyword">private</span> <span class="keyword">boolean</span> acknowledged;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> String <span class="title">getPurchaseToken</span><span class="params">()</span> </span>&#123;</span><br><span class="line">             <span class="keyword">return</span> purchaseToken;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPurchaseToken</span><span class="params">(String purchaseToken)</span> </span>&#123;</span><br><span class="line">             <span class="keyword">this</span>.purchaseToken = purchaseToken;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> String <span class="title">getPurchaseState</span><span class="params">()</span> </span>&#123;</span><br><span class="line">             <span class="keyword">return</span> purchaseState;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPurchaseState</span><span class="params">(String purchaseState)</span> </span>&#123;</span><br><span class="line">             <span class="keyword">this</span>.purchaseState = purchaseState;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> String <span class="title">getPackageName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">             <span class="keyword">return</span> packageName;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPackageName</span><span class="params">(String packageName)</span> </span>&#123;</span><br><span class="line">             <span class="keyword">this</span>.packageName = packageName;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> String <span class="title">getOrderId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">             <span class="keyword">return</span> orderId;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setOrderId</span><span class="params">(String orderId)</span> </span>&#123;</span><br><span class="line">             <span class="keyword">this</span>.orderId = orderId;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> String <span class="title">getProductId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">             <span class="keyword">return</span> productId;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setProductId</span><span class="params">(String productId)</span> </span>&#123;</span><br><span class="line">             <span class="keyword">this</span>.productId = productId;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isAcknowledged</span><span class="params">()</span> </span>&#123;</span><br><span class="line">             <span class="keyword">return</span> acknowledged;</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAcknowledged</span><span class="params">(<span class="keyword">boolean</span> acknowledged)</span> </span>&#123;</span><br><span class="line">             <span class="keyword">this</span>.acknowledged = acknowledged;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure>
+<p>好啦，基本代码差不多就是这些了。在对接过程中，我又几点要提示的。</p>
+<h2 id="Tips">Tips</h2>
+<ul>
+<li>谷歌测试账号下单五分钟内没有任何操作比如验证确认消耗就会自动取消该订单，消耗型的产品需在三天内确认订单，否则此订单无效。</li>
+<li>确认订单可以在服务端或客户端进行，但是消耗型商品需要进行消耗(订阅型商品不需要进行消耗),服务端只能确认不能消耗产品，验证并确认完毕的产品需要客户端进行消耗，否则下次购买时将不允许再次购买。</li>
+<li>谷歌支付生产订阅和测试订阅的周期不同，如下图：<br>
+<img src="/images/googlepay11.png" alt=""></li>
+<li>如果是测试账号的订阅，最多可续订6次。<br>
+如果是用测试账号来进行订阅的话，因为周期非常短，一个月循环5分钟就会到期，而一年的循环30分钟分钟就会到期。<br>
+而且这种测试订阅最多可续订6次，也就是从刚开始订阅 {subId} 到 {subId}…5 这样子，最多6单过来之后，接下来 google 那边就会发过来取消循环的 webhook 了，然后就取消循环了。<br>
+具体的文档：<a href="https://developer.android.com/google/play/billing/billing_testing#testing-renewals" target="_blank" rel="noopener">测试订阅续订</a><br>
+感谢您的浏览，希望对您有所帮助！</li>
+</ul>
+<p><a href="https://kebingzao.com/2018/08/09/google-iap-gcp-webhook/" target="_blank" rel="noopener">Google iap webhook 接入(2) - 项目接入GCP webhook</a></p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>欣赏此文？求鼓励，求支持！</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="jiangfumei 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="jiangfumei 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>jiangfumei
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jiangfumei.github.io/2019/12/20/googlepay/" title="SpringBoot接入Google Play">https://jiangfumei.github.io/2019/12/20/googlepay/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9/" rel="tag"># 第三方</a>
+              <a href="/tags/Google-Play/" rel="tag"># Google Play</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/14/docker-dockerfile/" rel="prev" title="Docker之Dockfile">
+      <i class="fa fa-chevron-left"></i> Docker之Dockfile
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/24/iospay/" rel="next" title="springboot接入苹果内购">
+      springboot接入苹果内购 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#撸代码前的准备工作"><span class="nav-number">1.</span> <span class="nav-text">撸代码前的准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码部分"><span class="nav-number">2.</span> <span class="nav-text">代码部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tips"><span class="nav-number">3.</span> <span class="nav-text">Tips</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="jiangfumei"
+      src="/images/hade.jpg">
+  <p class="site-author-name" itemprop="name">jiangfumei</p>
+  <div class="site-description" itemprop="description">學無止境，氣有浩然</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jiangfumei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jiangfumei" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:fumeijiang666@gmail.com" title="E-Mail → mailto:fumeijiang666@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/JFM%C3%B7UP" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;JFM÷UP" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://plus.google.com/fumeijiang666" title="Google → https:&#x2F;&#x2F;plus.google.com&#x2F;fumeijiang666" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://waver.me/" title="https:&#x2F;&#x2F;waver.me&#x2F;" rel="noopener" target="_blank">waver</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://ehlxr.me/" title="https:&#x2F;&#x2F;ehlxr.me&#x2F;" rel="noopener" target="_blank">ehlxr</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://blog.didispace.com/" title="http:&#x2F;&#x2F;blog.didispace.com" rel="noopener" target="_blank">程序员DD</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.fangzhipeng.com/" title="https:&#x2F;&#x2F;www.fangzhipeng.com&#x2F;" rel="noopener" target="_blank">方志朋</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.ityouknow.com/" title="http:&#x2F;&#x2F;www.ityouknow.com" rel="noopener" target="_blank">纯洁的微笑</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">by jiangfumei</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el: '#valine-comments',
+      verify: false,
+      notify: false,
+      appId: '6nnjNCU2uosA1eXry8i8DXaM-gzGzoHsz',
+      appKey: 'Cq81iddtrhNg4ooyofXIUUBL',
+      placeholder: "Just go go",
+      avatar: 'robohash',
+      meta: guest,
+      pageSize: '10' || 10,
+      visitor: false,
+      lang: '' || 'zh-cn',
+      path: location.pathname,
+      recordIP: false,
+      serverURLs: ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/site32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://jiangfumei.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="开篇 SpringCloud越来越火，咱也得跟上潮流啊，闲暇之余，自己学习并代码实战了下，其实发现并不难，知道其各个模块是干什么的并且能够运用就够了，下面我就简单说下自己学习过程的心得，也算是总结一下。 微服务 简而言之，微服务架构风格是一种将单个应用程序作为一套小型服务开发的方法，每种应用程序都在自己的进程中运行，并与轻量级机制（通常是HTTP资源API）进行通信。 这些服务是围绕业务功能构建的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初识SpringCloud">
+<meta property="og:url" content="https://jiangfumei.github.io/2019/09/07/springcloud-learn/index.html">
+<meta property="og:site_name" content="Struggler&#39;s Blog">
+<meta property="og:description" content="开篇 SpringCloud越来越火，咱也得跟上潮流啊，闲暇之余，自己学习并代码实战了下，其实发现并不难，知道其各个模块是干什么的并且能够运用就够了，下面我就简单说下自己学习过程的心得，也算是总结一下。 微服务 简而言之，微服务架构风格是一种将单个应用程序作为一套小型服务开发的方法，每种应用程序都在自己的进程中运行，并与轻量级机制（通常是HTTP资源API）进行通信。 这些服务是围绕业务功能构建的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-09-07T09:26:10.000Z">
+<meta property="article:modified_time" content="2020-04-09T06:53:54.368Z">
+<meta property="article:author" content="jiangfumei">
+<meta property="article:tag" content="SpringCloud">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jiangfumei.github.io/2019/09/07/springcloud-learn/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>初识SpringCloud | Struggler's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Struggler's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">随感随记</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">20</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">17</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">30</span></a>
+
+  </li>
+        <li class="menu-item menu-item-comments">
+
+    <a href="/comments/" rel="section"><i class="fa fa-fw fa-comments"></i>comments</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jiangfumei" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jiangfumei.github.io/2019/09/07/springcloud-learn/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hade.jpg">
+      <meta itemprop="name" content="jiangfumei">
+      <meta itemprop="description" content="學無止境，氣有浩然">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Struggler's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          初识SpringCloud<a href="https://github.com/user-name/repo-name/tree/branch-name/subdirectory-name_posts/springcloud-learn.md" class="post-edit-link" title="编辑" rel="noopener" target="_blank"><i class="fa fa-pencil"></i></a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-09-07 17:26:10" itemprop="dateCreated datePublished" datetime="2019-09-07T17:26:10+08:00">2019-09-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-09 14:53:54" itemprop="dateModified" datetime="2020-04-09T14:53:54+08:00">2020-04-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringCloud/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringCloud</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/09/07/springcloud-learn/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/09/07/springcloud-learn/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="开篇">开篇</h2>
+<p>SpringCloud越来越火，咱也得跟上潮流啊，闲暇之余，自己学习并代码实战了下，其实发现并不难，知道其各个模块是干什么的并且能够运用就够了，下面我就简单说下自己学习过程的心得，也算是总结一下。</p>
+<h2 id="微服务">微服务</h2>
+<p>简而言之，微服务架构风格是一种将单个应用程序作为一套小型服务开发的方法，每种应用程序都在自己的进程中运行，并与轻量级机制（通常是HTTP资源API）进行通信。 这些服务是围绕业务功能构建的，可以通过全自动部署机制独立部署。 这些服务的集中管理最少，可以用不同的编程语言编写，并使用不同的数据存储技术。</p>
+<a id="more"></a>
+<h2 id="为什么要用微服务">为什么要用微服务</h2>
+<p>特点：<br>
+1、独立部署，灵活扩展<br>
+2、资源的有效隔离<br>
+3、团队组织架构的调整<br>
+和soa的区别：<br>
+soa架构是一种粗粒度松耦合的服务架构，SOA架构强调的是异构系统之间的通信和解耦合，而微服务架构强调的是系统按业务边界做细粒度的拆分和部署。</p>
+<h2 id="微服务组件">微服务组件</h2>
+<h3 id="包含的主要组件以及各组件主要是干什么的">包含的主要组件以及各组件主要是干什么的</h3>
+<p><code>Eureka</code>、<code>Ribbon</code>、<code>Feign</code>、<code>Hystrix</code>、<code>Zuul</code>这几个组件</p>
+<h4 id="一、Eureka-服务注册与发现。包含Eureka-Server和Eureka-Client">一、Eureka:服务注册与发现。包含Eureka Server和Eureka Client</h4>
+<p>Eureka Server:注册中心，里面有一个注册表，保存了各个服务所在的机器和端口号.<br>
+Eureka Client:负责将这个服务的信息注册到Eureka Server中</p>
+<h4 id="二、Feign-关键机制就是使用了动态代理">二、Feign:关键机制就是使用了动态代理</h4>
+<p>过程：<br>
+首先，如果你对某个接口定义了<code>@FeignClient</code>注解，Feign就会针对这个接口创建一个动态代理<br>
+接着你要是调用那个接口，本质就是会调用 Feign创建的动态代理，这是核心中的核心<br>
+<code>Feign</code>的动态代理会根据你在接口上的<code>@RequestMapping</code>等注解，来动态构造出你要请求的服务的地址<br>
+最后针对这个地址，发起请求、解析响应</p>
+<h4 id="三、Ribbon-负载均衡。假如一个服务部署到几台服务器上，它的作用是负载均衡，会帮你在每次请求时选择一台机器，均匀的把请求分发到各个机器上。">三、Ribbon:负载均衡。假如一个服务部署到几台服务器上，它的作用是负载均衡，会帮你在每次请求时选择一台机器，均匀的把请求分发到各个机器上。</h4>
+<h4 id="四、断路器（Hystrix）">四、断路器（Hystrix）</h4>
+<p>这么多服务互相调用，要是不做任何保护的话，某一个服务挂了，就会引起连锁反应，导致别的服务也挂。如果系统处于高并发的场景下，大量请求涌过来的时候，订单服务的100个线程都会卡在请求积分服务这块。导致订单服务没有一个线程可以处理请求，造成服务雪崩问题。<br>
+<code>Hystrix</code>是隔离、熔断以及降级的一个框架。说白了，Hystrix会搞很多个小小的线程池，比如订单服务请求库存服务是一个线程池，请求仓储服务是一个线程池，请求积分服务是一个线程池。每个线程池里的线程就仅仅用于请求那个服务。<br>
+就是对请求的已经挂了的服务直接返回错误，不要去走网络请求卡住几秒钟，这个过程，就是所谓的熔断。咱不单单只是直接返回错误，这样也没有太大的意义，还要处理点什么，比如，在数据库里增加一条记录，说给某某用户增加了多少积分，因为积分服务挂了，导致没增加成功！这样等积分服务恢复了，你可以根据这些记录手工加一下积分。这个过程，就是所谓的降级。</p>
+<h4 id="五、服务网关（Zuul）">五、服务网关（Zuul）</h4>
+<p>一般微服务架构中都必然会设计一个网关在里面，像android、ios、pc前端、微信小程序、H5等等，不用去关心后端有几百个服务，就知道有一个网关，所有请求都往网关走，网关会根据请求中的一些特征，将请求转发给后端的各个服务。<br>
+而且有一个网关之后，还有很多好处，比如可以做统一的降级、限流、认证授权、安全，等等。</p>
+<h4 id="六、服务配置中心-（Spring-Cloud-Config）">六、服务配置中心 （Spring Cloud Config）</h4>
+<p>在分布式系统中，由于服务数量巨多，为了方便服务配置文件统一管理，实时更新，所以需要分布式配置中心组件。在Spring Cloud中，有分布式配置中心组件spring cloud config ，它支持配置服务放在配置服务的内存中（即本地），也支持放在远程Git仓库中。在spring cloud config 组件中，分两个角色，一是config server，二是config client。</p>
+<h4 id="七、服务链路追踪（Spring-Cloud-Sleuth）">七、服务链路追踪（Spring Cloud Sleuth）</h4>
+<p><code>Spring Cloud Sleuth </code>主要功能就是在分布式系统中提供追踪解决方案，并且兼容支持了 <code>Zipkin</code>，你只需要在pom文件中引入相应的依赖即可。服务间相互调用，<code>Zipkin</code>收集数据.</p>
+<h4 id="八、-消息总线（Spring-Cloud-Bus）">八、 消息总线（Spring Cloud Bus）</h4>
+<p>Spring Cloud Bus 将分布式的节点用轻量的消息代理连接起来。它可以用于广播配置文件的更改或者服务之间的通讯，也可以用于监控。例如github上的配置文件有更新时，只需发送请求/bus/refresh/,再请求配置文件发现内容已更新。</p>
+<h4 id="九、高可用的服务中心：Eureka通过运行多个实例，使其更具有高可用性。事实上，这是它默认的熟性，你需要做的就是给对等的实例一个合法的关联serviceurl。简单来说就是建多个服务注册中心，具体做法就是写多个application-xx-yml-改变etc-hosts，linux系统通过vim-etc-hosts-加上：127-0-0-1-xx-127-0-0-1-yy-xx-yy就是你application的后缀名-windows电脑，在c-windows-systems-drivers-etc-hosts-修改。启动工程：">九、高可用的服务中心：Eureka通过运行多个实例，使其更具有高可用性。事实上，这是它默认的熟性，你需要做的就是给对等的实例一个合法的关联serviceurl。简单来说就是建多个服务注册中心，具体做法就是写多个application_xx.yml,改变etc/hosts，linux系统通过vim /etc/hosts ,加上：127.0.0.1 xx , 127.0.0.1 yy(xx,yy就是你application的后缀名),windows电脑，在c:/windows/systems/drivers/etc/hosts 修改。启动工程：</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java -jar eureka-server-0.0.1-SNAPSHOT.jar - -spring.profiles.active=xx</span><br><span class="line">java -jar eureka-server-0.0.1-SNAPSHOT.jar - -spring.profiles.active=yy</span><br></pre></td></tr></table></figure>
+<p>Eureka-eserver xx ,Eureka-eserver yy 相互感应，当有服务注册时，两个Eureka-eserver是对等的，它们都存有相同的信息。这就是通过服务器的冗余来增加可靠性，当有一台服务器宕机了，服务并不会终止，因为另一台服务存有相同的数据。</p>
+<h4 id="断路器聚合监控（Hystrix-Turbine）">断路器聚合监控（Hystrix Turbine）</h4>
+<p>看单个的<code>Hystrix Dashboard</code>的数据并没有什么多大的价值，要想看这个系统的Hystrix Dashboard数据就需要用到<code>Hystrix Turbine</code>。<code>Hystrix Turbine</code>将每个服务<code>Hystrix Dashboard</code>数据进行了整合。<code>Hystrix Turbine</code>的使用非常简单，只需要引入相应的依赖和加上注解和配置就可以了。</p>
+<h4 id="网关（Spring-Cloud-Gateway）">网关（Spring Cloud Gateway）</h4>
+<p><code>Spring Cloud Gateway</code>是Spring Cloud官方推出的第二代网关框架，取代Zuul网关。网关作为流量的，在微服务系统中有着非常作用，网关常见的功能有路由转发、权限校验、限流控制等作用。</p>
+<h2 id="Tips">Tips</h2>
+<ul>
+<li>搭建springcloud的modules时，父模块打包方式是pom,子模块为jar</li>
+<li>父模块不需要增加构建插件maven-plugin，公共模块提取出单独作为一个module时，也不需要maven-plugin；子模块作为父模块其下又有子模块，则这个子模块不需要添加maven-plugin,打包方式为pom,除此之外,其它均需maven-plugin<br>
+maven示例请查阅<a href="">下篇文章</a>。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>欣赏此文？求鼓励，求支持！</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="jiangfumei 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="jiangfumei 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>jiangfumei
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jiangfumei.github.io/2019/09/07/springcloud-learn/" title="初识SpringCloud">https://jiangfumei.github.io/2019/09/07/springcloud-learn/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SpringCloud/" rel="tag"># SpringCloud</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/30/jpush/" rel="prev" title="极光推送服务端集成">
+      <i class="fa fa-chevron-left"></i> 极光推送服务端集成
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/28/rabbitmq-topicexchange/" rel="next" title="Rabbitmq 学习">
+      Rabbitmq 学习 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#开篇"><span class="nav-number">1.</span> <span class="nav-text">开篇</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微服务"><span class="nav-number">2.</span> <span class="nav-text">微服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要用微服务"><span class="nav-number">3.</span> <span class="nav-text">为什么要用微服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微服务组件"><span class="nav-number">4.</span> <span class="nav-text">微服务组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#包含的主要组件以及各组件主要是干什么的"><span class="nav-number">4.1.</span> <span class="nav-text">包含的主要组件以及各组件主要是干什么的</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#一、Eureka-服务注册与发现。包含Eureka-Server和Eureka-Client"><span class="nav-number">4.1.1.</span> <span class="nav-text">一、Eureka:服务注册与发现。包含Eureka Server和Eureka Client</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二、Feign-关键机制就是使用了动态代理"><span class="nav-number">4.1.2.</span> <span class="nav-text">二、Feign:关键机制就是使用了动态代理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#三、Ribbon-负载均衡。假如一个服务部署到几台服务器上，它的作用是负载均衡，会帮你在每次请求时选择一台机器，均匀的把请求分发到各个机器上。"><span class="nav-number">4.1.3.</span> <span class="nav-text">三、Ribbon:负载均衡。假如一个服务部署到几台服务器上，它的作用是负载均衡，会帮你在每次请求时选择一台机器，均匀的把请求分发到各个机器上。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#四、断路器（Hystrix）"><span class="nav-number">4.1.4.</span> <span class="nav-text">四、断路器（Hystrix）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#五、服务网关（Zuul）"><span class="nav-number">4.1.5.</span> <span class="nav-text">五、服务网关（Zuul）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#六、服务配置中心-（Spring-Cloud-Config）"><span class="nav-number">4.1.6.</span> <span class="nav-text">六、服务配置中心 （Spring Cloud Config）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#七、服务链路追踪（Spring-Cloud-Sleuth）"><span class="nav-number">4.1.7.</span> <span class="nav-text">七、服务链路追踪（Spring Cloud Sleuth）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#八、-消息总线（Spring-Cloud-Bus）"><span class="nav-number">4.1.8.</span> <span class="nav-text">八、 消息总线（Spring Cloud Bus）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#九、高可用的服务中心：Eureka通过运行多个实例，使其更具有高可用性。事实上，这是它默认的熟性，你需要做的就是给对等的实例一个合法的关联serviceurl。简单来说就是建多个服务注册中心，具体做法就是写多个application-xx-yml-改变etc-hosts，linux系统通过vim-etc-hosts-加上：127-0-0-1-xx-127-0-0-1-yy-xx-yy就是你application的后缀名-windows电脑，在c-windows-systems-drivers-etc-hosts-修改。启动工程："><span class="nav-number">4.1.9.</span> <span class="nav-text">九、高可用的服务中心：Eureka通过运行多个实例，使其更具有高可用性。事实上，这是它默认的熟性，你需要做的就是给对等的实例一个合法的关联serviceurl。简单来说就是建多个服务注册中心，具体做法就是写多个application_xx.yml,改变etc&#x2F;hosts，linux系统通过vim &#x2F;etc&#x2F;hosts ,加上：127.0.0.1 xx , 127.0.0.1 yy(xx,yy就是你application的后缀名),windows电脑，在c:&#x2F;windows&#x2F;systems&#x2F;drivers&#x2F;etc&#x2F;hosts 修改。启动工程：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#断路器聚合监控（Hystrix-Turbine）"><span class="nav-number">4.1.10.</span> <span class="nav-text">断路器聚合监控（Hystrix Turbine）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网关（Spring-Cloud-Gateway）"><span class="nav-number">4.1.11.</span> <span class="nav-text">网关（Spring Cloud Gateway）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Tips"><span class="nav-number">5.</span> <span class="nav-text">Tips</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="jiangfumei"
+      src="/images/hade.jpg">
+  <p class="site-author-name" itemprop="name">jiangfumei</p>
+  <div class="site-description" itemprop="description">學無止境，氣有浩然</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jiangfumei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jiangfumei" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:fumeijiang666@gmail.com" title="E-Mail → mailto:fumeijiang666@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/JFM%C3%B7UP" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;JFM÷UP" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://plus.google.com/fumeijiang666" title="Google → https:&#x2F;&#x2F;plus.google.com&#x2F;fumeijiang666" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://waver.me/" title="https:&#x2F;&#x2F;waver.me&#x2F;" rel="noopener" target="_blank">waver</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://ehlxr.me/" title="https:&#x2F;&#x2F;ehlxr.me&#x2F;" rel="noopener" target="_blank">ehlxr</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://blog.didispace.com/" title="http:&#x2F;&#x2F;blog.didispace.com" rel="noopener" target="_blank">程序员DD</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.fangzhipeng.com/" title="https:&#x2F;&#x2F;www.fangzhipeng.com&#x2F;" rel="noopener" target="_blank">方志朋</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.ityouknow.com/" title="http:&#x2F;&#x2F;www.ityouknow.com" rel="noopener" target="_blank">纯洁的微笑</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">by jiangfumei</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el: '#valine-comments',
+      verify: false,
+      notify: false,
+      appId: '6nnjNCU2uosA1eXry8i8DXaM-gzGzoHsz',
+      appKey: 'Cq81iddtrhNg4ooyofXIUUBL',
+      placeholder: "Just go go",
+      avatar: 'robohash',
+      meta: guest,
+      pageSize: '10' || 10,
+      visitor: false,
+      lang: '' || 'zh-cn',
+      path: location.pathname,
+      recordIP: false,
+      serverURLs: ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

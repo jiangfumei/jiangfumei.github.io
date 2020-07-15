@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/site32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://jiangfumei.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="背景 最近在做一款直播app,涉及到了IM通讯，实现直播群组聊天，IM注册、登录，改换头像、昵称等。用的是腾讯IM。 Api调用 准备工作 服务端需记录腾讯IM控制台里的sdk app id及应用的密钥">
+<meta property="og:type" content="article">
+<meta property="og:title" content="即时通讯IM">
+<meta property="og:url" content="https://jiangfumei.github.io/2020/03/19/tecent-im/index.html">
+<meta property="og:site_name" content="Struggler&#39;s Blog">
+<meta property="og:description" content="背景 最近在做一款直播app,涉及到了IM通讯，实现直播群组聊天，IM注册、登录，改换头像、昵称等。用的是腾讯IM。 Api调用 准备工作 服务端需记录腾讯IM控制台里的sdk app id及应用的密钥">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-19T07:49:16.000Z">
+<meta property="article:modified_time" content="2020-04-15T09:10:35.752Z">
+<meta property="article:author" content="jiangfumei">
+<meta property="article:tag" content="第三方">
+<meta property="article:tag" content="腾讯IM">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://jiangfumei.github.io/2020/03/19/tecent-im/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>即时通讯IM | Struggler's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Struggler's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">随感随记</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">20</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">17</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">30</span></a>
+
+  </li>
+        <li class="menu-item menu-item-comments">
+
+    <a href="/comments/" rel="section"><i class="fa fa-fw fa-comments"></i>comments</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-fw fa-heartbeat"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/jiangfumei" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jiangfumei.github.io/2020/03/19/tecent-im/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hade.jpg">
+      <meta itemprop="name" content="jiangfumei">
+      <meta itemprop="description" content="學無止境，氣有浩然">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Struggler's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          即时通讯IM<a href="https://github.com/user-name/repo-name/tree/branch-name/subdirectory-name_posts/tecent-im.md" class="post-edit-link" title="编辑" rel="noopener" target="_blank"><i class="fa fa-pencil"></i></a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-19 15:49:16" itemprop="dateCreated datePublished" datetime="2020-03-19T15:49:16+08:00">2020-03-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-15 17:10:35" itemprop="dateModified" datetime="2020-04-15T17:10:35+08:00">2020-04-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%AC%E4%B8%89%E6%96%B9/" itemprop="url" rel="index">
+                    <span itemprop="name">第三方</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2020/03/19/tecent-im/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2020/03/19/tecent-im/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="背景">背景</h2>
+<p>最近在做一款直播app,涉及到了IM通讯，实现直播群组聊天，IM注册、登录，改换头像、昵称等。用的是腾讯IM。</p>
+<h2 id="Api调用">Api调用</h2>
+<h3 id="准备工作">准备工作</h3>
+<p>服务端需记录腾讯IM控制台里的sdk app id及应用的密钥</p>
+<a id="more"></a>
+<h3 id="代码">代码</h3>
+<p>Constant.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Constant</span> </span>&#123;</span><br><span class="line">    <span class="comment">//IM通讯sdkappid    密钥</span></span><br><span class="line">    public static final Integer SDK_APPID = ######;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY = <span class="string">"#######################################3"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String IDENTIFIER = <span class="string">"admin"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TimService.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(<span class="string">"timService"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimService</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger log = LoggerFactory.getLogger(TimService<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HOST = <span class="string">"https://console.tim.qq.com"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RestTemplate restTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SysLog</span>(<span class="string">"单账号导入"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ProcessResult <span class="title">accountImport</span><span class="params">(String Identifier)</span> </span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"im_open_login_svc"</span>, <span class="string">"account_import"</span>, userSig);</span><br><span class="line">        Map jsonObj = Collections.singletonMap(<span class="string">"Identifier"</span>,Identifier);</span><br><span class="line">        HttpEntity&lt;String&gt; formEntity = <span class="keyword">new</span> HttpEntity&lt;String&gt;(JsonUtil.toJSON(jsonObj));</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, formEntity, Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"OK"</span>.equalsIgnoreCase(result.get(<span class="string">"ActionStatus"</span>))) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ProcessResult(ProcessResult.SUCCESS,<span class="string">"single account import success"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ProcessResult(ProcessResult.ERROR,<span class="string">"single account import failure"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SysLog</span>(<span class="string">"创建群组"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">createGroup</span><span class="params">(GoVideo goVideo)</span> </span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"group_open_http_svc"</span>, <span class="string">"create_group"</span>, userSig);</span><br><span class="line">        Map&lt;String, Object&gt; jsonObj = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        <span class="comment">//jsonObj.put("Owner_Account",username);群主的userId  待后期扩展</span></span><br><span class="line">        jsonObj.put(<span class="string">"Type"</span>,<span class="string">"AVChatRoom"</span>);<span class="comment">//音视频聊天室</span></span><br><span class="line">        jsonObj.put(<span class="string">"Name"</span>,<span class="string">"Group-"</span>+goVideo.getId());</span><br><span class="line">        jsonObj.put(<span class="string">"GroupId"</span>,<span class="string">"live-"</span>+goVideo.getId());</span><br><span class="line">        HttpEntity&lt;String&gt; formEntity = <span class="keyword">new</span> HttpEntity&lt;String&gt;(JsonUtil.toJSON(jsonObj));</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, formEntity, Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SysLog</span>(<span class="string">"APP自定义脏字"</span>)</span><br><span class="line">    <span class="meta">@PostMapping</span>(value = <span class="string">"/addDirtyWOrd"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ProcessResult <span class="title">addDirtyWord</span><span class="params">(@RequestBody String jsonString)</span> </span>&#123;</span><br><span class="line">        Map jsonObj = JsonUtil.fromJSON(jsonString, Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"openim_dirty_words"</span>, <span class="string">"add"</span>, userSig);</span><br><span class="line">        HttpEntity&lt;String&gt; formEntity = <span class="keyword">new</span> HttpEntity&lt;String&gt;(JsonUtil.toJSON(jsonObj));</span><br><span class="line">        Map&lt;String, String&gt; rowData = restTemplate.postForObject(url, formEntity, Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        String actionStatus = rowData.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">        <span class="keyword">if</span>(<span class="string">"OK"</span>.equalsIgnoreCase(actionStatus)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ProcessResult(ProcessResult.SUCCESS,<span class="string">"add dirty word success"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ProcessResult(ProcessResult.ERROR,<span class="string">"add dirty word failure :: "</span> + JsonUtil.toJSON(rowData));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SysLog</span>(<span class="string">"解散群组"</span>)</span><br><span class="line">    <span class="meta">@PostMapping</span>(value = <span class="string">"/destroyGroup"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">destroyGroup</span><span class="params">(GoVideo goVideo)</span> </span>&#123;</span><br><span class="line">        Map&lt;String,Object&gt; jsonObj = <span class="keyword">new</span> HashMap();</span><br><span class="line">        jsonObj.put(<span class="string">"GroupId"</span>,goVideo.getGroupId());</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"group_open_http_svc"</span>, <span class="string">"destroy_group"</span>, userSig);</span><br><span class="line">        HttpEntity&lt;String&gt; formEntity = <span class="keyword">new</span> HttpEntity&lt;String&gt;(JsonUtil.toJSON(jsonObj));</span><br><span class="line">        Map&lt;String, String&gt; rowData = restTemplate.postForObject(url, formEntity, Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        log.info(<span class="string">"===========解散群组================== &#123;&#125;"</span>, goVideo.getGroupId());</span><br><span class="line">        <span class="keyword">return</span> rowData.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * im注册</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nickName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> faceUrl</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">registe</span><span class="params">(String uuid,String nickName,String faceUrl)</span></span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"im_open_login_svc"</span>,<span class="string">"account_import"</span>,userSig);</span><br><span class="line">        Map&lt;String,Object&gt; jsonObj = <span class="keyword">new</span> HashMap();</span><br><span class="line">        jsonObj.put(<span class="string">"Identifier"</span>,uuid);</span><br><span class="line">        jsonObj.put(<span class="string">"Nick"</span>,nickName);</span><br><span class="line">        jsonObj.put(<span class="string">"FaceUrl"</span>,faceUrl);</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, jsonObj, Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * im修改头像</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">updateImFaceUrl</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"profile"</span>, <span class="string">"portrait_set"</span>, userSig);</span><br><span class="line">        ArrayList&lt;Object&gt; profileItem = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        HashMap&lt;String, Object&gt; jsonObj = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        jsonObj.put(<span class="string">"Tag"</span>, <span class="string">"Tag_Profile_IM_Image"</span>);</span><br><span class="line">        jsonObj.put(<span class="string">"Value"</span>, user.getAvatar());</span><br><span class="line">        profileItem.add(jsonObj);</span><br><span class="line">        MapBuild&lt;String, String&gt; obj = <span class="keyword">new</span> MapBuild&lt;String, String&gt;().put(<span class="string">"From_Account"</span>,user.getUuid()).put(<span class="string">"ProfileItem"</span>, profileItem);</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, obj.build(), Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * im修改昵称</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> uuid</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nickName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">updateImNick</span><span class="params">(String uuid,String nickName)</span> </span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"profile"</span>, <span class="string">"portrait_set"</span>, userSig);</span><br><span class="line">        ArrayList&lt;Object&gt; profileItem = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        HashMap&lt;String, Object&gt; jsonObj = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        jsonObj.put(<span class="string">"Tag"</span>, <span class="string">"Tag_Profile_IM_Nick"</span>);</span><br><span class="line">        jsonObj.put(<span class="string">"Value"</span>, nickName);</span><br><span class="line">        profileItem.add(jsonObj);</span><br><span class="line">        MapBuild&lt;String, String&gt; obj = <span class="keyword">new</span> MapBuild&lt;String, String&gt;().put(<span class="string">"From_Account"</span>, uuid).put(<span class="string">"ProfileItem"</span>, profileItem);</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, obj.build(), Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> uuid</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getProfilePortrait</span><span class="params">(String uuid)</span></span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"profile"</span>,<span class="string">"portrait_get"</span>,userSig);</span><br><span class="line">        MapBuild&lt;String, String[]&gt; obj = <span class="keyword">new</span> MapBuild&lt;String, String[]&gt;().put(<span class="string">"To_Account"</span>,<span class="keyword">new</span> String[] &#123;uuid&#125;)</span><br><span class="line">                .put(<span class="string">"TagList"</span>,<span class="keyword">new</span> String[] &#123;<span class="string">"Tag_Profile_IM_Nick"</span>,<span class="string">"Tag_Profile_IM_Image"</span>&#125;);</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, obj.build(), Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">formatUrl</span><span class="params">(String serviceName, String cmdName, String usersig)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">double</span> rd = Math.random() * <span class="number">999_999_999</span>;</span><br><span class="line">        String url = String.format(<span class="string">"%s/v4/%s/%s?usersig=%s&amp;identifier=%s&amp;sdkappid=%s&amp;random=%d&amp;contenttype=json"</span>, HOST, serviceName, cmdName, usersig, Constant.IDENTIFIER, Constant.SDK_APPID,</span><br><span class="line">                (<span class="keyword">int</span>) rd);</span><br><span class="line">        <span class="keyword">return</span> url;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SysLog</span>(<span class="string">"获取userSig"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getUserSig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        TLSSigAPIv2 api = <span class="keyword">new</span> TLSSigAPIv2(Constant.SDK_APPID, Constant.KEY);</span><br><span class="line">        String userSig = api.genSig(Constant.IDENTIFIER , <span class="number">180</span> * <span class="number">86400</span>);</span><br><span class="line">        <span class="keyword">return</span> userSig;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>工具类TLSSigAPIv2.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xy.goone.modules.sys.util;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSONObject;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.net.util.Base64;</span><br><span class="line"><span class="keyword">import</span> sun.misc.BASE64Encoder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.crypto.Mac;</span><br><span class="line"><span class="keyword">import</span> javax.crypto.spec.SecretKeySpec;</span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.nio.charset.Charset;</span><br><span class="line"><span class="keyword">import</span> java.security.InvalidKeyException;</span><br><span class="line"><span class="keyword">import</span> java.security.NoSuchAlgorithmException;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.zip.Deflater;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TLSSigAPIv2</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> sdkappid;</span><br><span class="line">    <span class="keyword">private</span> String key;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TLSSigAPIv2</span><span class="params">(<span class="keyword">long</span> sdkappid, String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.sdkappid = sdkappid;</span><br><span class="line">        <span class="keyword">this</span>.key = key;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">hmacsha256</span><span class="params">(String identifier, <span class="keyword">long</span> currTime, <span class="keyword">long</span> expire, String base64Userbuf)</span> </span>&#123;</span><br><span class="line">        String contentToBeSigned = <span class="string">"TLS.identifier:"</span> + identifier + <span class="string">"\n"</span></span><br><span class="line">                + <span class="string">"TLS.sdkappid:"</span> + sdkappid + <span class="string">"\n"</span></span><br><span class="line">                + <span class="string">"TLS.time:"</span> + currTime + <span class="string">"\n"</span></span><br><span class="line">                + <span class="string">"TLS.expire:"</span> + expire + <span class="string">"\n"</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != base64Userbuf) &#123;</span><br><span class="line">            contentToBeSigned += <span class="string">"TLS.userbuf:"</span> + base64Userbuf + <span class="string">"\n"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">byte</span>[] byteKey = key.getBytes(<span class="string">"UTF-8"</span>);</span><br><span class="line">            Mac hmac = Mac.getInstance(<span class="string">"HmacSHA256"</span>);</span><br><span class="line">            SecretKeySpec keySpec = <span class="keyword">new</span> SecretKeySpec(byteKey, <span class="string">"HmacSHA256"</span>);</span><br><span class="line">            hmac.init(keySpec);</span><br><span class="line">            <span class="keyword">byte</span>[] byteSig = hmac.doFinal(contentToBeSigned.getBytes(<span class="string">"UTF-8"</span>));</span><br><span class="line">            <span class="comment">//return new String(Base64.encodeBase64(byteSig)).replaceAll("\\s*", "");</span></span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">new</span> BASE64Encoder().encode(byteSig)).replaceAll(<span class="string">"\\s*"</span>, <span class="string">""</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchAlgorithmException e) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvalidKeyException  e) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">genSig</span><span class="params">(String identifier, <span class="keyword">long</span> expire, <span class="keyword">byte</span>[] userbuf)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> currTime = System.currentTimeMillis()/<span class="number">1000</span>;</span><br><span class="line"></span><br><span class="line">        JSONObject sigDoc = <span class="keyword">new</span> JSONObject();</span><br><span class="line">        sigDoc.put(<span class="string">"TLS.ver"</span>, <span class="string">"2.0"</span>);</span><br><span class="line">        sigDoc.put(<span class="string">"TLS.identifier"</span>, identifier);</span><br><span class="line">        sigDoc.put(<span class="string">"TLS.sdkappid"</span>, sdkappid);</span><br><span class="line">        sigDoc.put(<span class="string">"TLS.expire"</span>, expire);</span><br><span class="line">        sigDoc.put(<span class="string">"TLS.time"</span>, currTime);</span><br><span class="line"></span><br><span class="line">        String base64UserBuf = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != userbuf) &#123;</span><br><span class="line">            <span class="comment">//base64UserBuf = new String(Base64.encodeBase64(userbuf));</span></span><br><span class="line">            base64UserBuf = <span class="keyword">new</span> BASE64Encoder().encode(userbuf);</span><br><span class="line">            sigDoc.put(<span class="string">"TLS.userbuf"</span>, base64UserBuf);</span><br><span class="line">        &#125;</span><br><span class="line">        String sig = hmacsha256(identifier, currTime, expire, base64UserBuf);</span><br><span class="line">        <span class="keyword">if</span> (sig.length() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">""</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        sigDoc.put(<span class="string">"TLS.sig"</span>, sig);</span><br><span class="line">        Deflater compressor = <span class="keyword">new</span> Deflater();</span><br><span class="line">        compressor.setInput(sigDoc.toString().getBytes(Charset.forName(<span class="string">"UTF-8"</span>)));</span><br><span class="line">        compressor.finish();</span><br><span class="line">        <span class="keyword">byte</span> [] compressedBytes = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">2048</span>];</span><br><span class="line">        <span class="keyword">int</span> compressedBytesLength = compressor.deflate(compressedBytes);</span><br><span class="line">        compressor.end();</span><br><span class="line">        <span class="keyword">return</span> (<span class="keyword">new</span> String(Base64URL.base64EncodeUrl(Arrays.copyOfRange(compressedBytes,</span><br><span class="line">                <span class="number">0</span>, compressedBytesLength)))).replaceAll(<span class="string">"\\s*"</span>, <span class="string">""</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">genSig</span><span class="params">(String identifier, <span class="keyword">long</span> expire)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> genSig(identifier, expire, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">genSigWithUserBuf</span><span class="params">(String identifier, <span class="keyword">long</span> expire, <span class="keyword">byte</span>[] userbuf)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> genSig(identifier, expire, userbuf);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xy.goone.tengxim;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.xy.goone.common.Constant;</span><br><span class="line"><span class="keyword">import</span> com.xy.goone.common.util.MapBuild;</span><br><span class="line"><span class="keyword">import</span> com.xy.goone.modules.domain.User;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.client.RestTemplate;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> fumei.jiang</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2019-08-15</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImMessageService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HOST = <span class="string">"https://console.tim.qq.com"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> RestTemplate restTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * im注册</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nickName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> faceUrl</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">registe</span><span class="params">(String uuid,String nickName,String faceUrl)</span></span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"im_open_login_svc"</span>,<span class="string">"account_import"</span>,userSig);</span><br><span class="line">        Map&lt;String,Object&gt; jsonObj = <span class="keyword">new</span> HashMap();</span><br><span class="line">        jsonObj.put(<span class="string">"Identifier"</span>,uuid);</span><br><span class="line">        jsonObj.put(<span class="string">"Nick"</span>,nickName);</span><br><span class="line">        jsonObj.put(<span class="string">"FaceUrl"</span>,faceUrl);</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, jsonObj, Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * im修改头像</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">updateImFaceUrl</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"profile"</span>, <span class="string">"portrait_set"</span>, userSig);</span><br><span class="line">        ArrayList&lt;Object&gt; profileItem = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        HashMap&lt;String, Object&gt; jsonObj = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        jsonObj.put(<span class="string">"Tag"</span>, <span class="string">"Tag_Profile_IM_Image"</span>);</span><br><span class="line">        jsonObj.put(<span class="string">"Value"</span>, user.getAvatar());</span><br><span class="line">        profileItem.add(jsonObj);</span><br><span class="line">        MapBuild&lt;String, String&gt; obj = <span class="keyword">new</span> MapBuild&lt;String, String&gt;().put(<span class="string">"From_Account"</span>,user.getUuid()).put(<span class="string">"ProfileItem"</span>, profileItem);</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, obj.build(), Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">updateImNick</span><span class="params">(String uuid,String nickName)</span> </span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"profile"</span>, <span class="string">"portrait_set"</span>, userSig);</span><br><span class="line">        ArrayList&lt;Object&gt; profileItem = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        HashMap&lt;String, Object&gt; jsonObj = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        jsonObj.put(<span class="string">"Tag"</span>, <span class="string">"Tag_Profile_IM_Nick"</span>);</span><br><span class="line">        jsonObj.put(<span class="string">"Value"</span>, nickName);</span><br><span class="line">        profileItem.add(jsonObj);</span><br><span class="line">        MapBuild&lt;String, String&gt; obj = <span class="keyword">new</span> MapBuild&lt;String, String&gt;().put(<span class="string">"From_Account"</span>, uuid).put(<span class="string">"ProfileItem"</span>, profileItem);</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, obj.build(), Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getProfilePortrait</span><span class="params">(String uuid)</span></span>&#123;</span><br><span class="line">        String userSig = getUserSig();</span><br><span class="line">        String url = formatUrl(<span class="string">"profile"</span>,<span class="string">"portrait_get"</span>,userSig);</span><br><span class="line">        MapBuild&lt;String, String[]&gt; obj = <span class="keyword">new</span> MapBuild&lt;String, String[]&gt;().put(<span class="string">"To_Account"</span>,<span class="keyword">new</span> String[] &#123;uuid&#125;)</span><br><span class="line">                .put(<span class="string">"TagList"</span>,<span class="keyword">new</span> String[] &#123;<span class="string">"Tag_Profile_IM_Nick"</span>,<span class="string">"Tag_Profile_IM_Image"</span>&#125;);</span><br><span class="line">        Map&lt;String, String&gt; result = restTemplate.postForObject(url, obj.build(), Map<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> result.get(<span class="string">"ActionStatus"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取用户签名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getUserSig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        TLSSigAPIv2 api = <span class="keyword">new</span> TLSSigAPIv2(Constant.SDK_APPID, Constant.KEY);</span><br><span class="line">        String userSig = api.genSig(Constant.IDENTIFIER, <span class="number">180</span> * <span class="number">86400</span>);</span><br><span class="line">        <span class="keyword">return</span> userSig;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">formatUrl</span><span class="params">(String serviceName, String cmdName, String usersig)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">double</span> rd = Math.random() * <span class="number">999_999_999</span>;</span><br><span class="line">        String url = String.format(<span class="string">"%s/v4/%s/%s?usersig=%s&amp;identifier=%s&amp;sdkappid=%s&amp;random=%d&amp;contenttype=json"</span>, HOST, serviceName, cmdName, usersig, Constant.IDENTIFIER, Constant.SDK_APPID,</span><br><span class="line">                (<span class="keyword">int</span>) rd);</span><br><span class="line">        <span class="keyword">return</span> url;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>MapBuild.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"><span class="keyword">import</span> java.util.Map.Entry;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MapBuild</span>&lt;<span class="title">K</span>, <span class="title">V</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Map&lt;K, V&gt; map;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">MapBuild</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">MapBuild</span><span class="params">(Map&lt;K, V&gt; map)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.map = map;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.size();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEmpty</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.isEmpty();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">containsKey</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.containsKey(key);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">containsValue</span><span class="params">(Object value)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.containsValue(value);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.get(key);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> MapBuild&lt;K, V&gt; <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">		map.put(key, value);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">	<span class="function"><span class="keyword">public</span> MapBuild&lt;K, V&gt; <span class="title">put</span><span class="params">(K key, List&lt;Object&gt; value)</span> </span>&#123;</span><br><span class="line">		map.put(key, (V) value);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">	<span class="function"><span class="keyword">public</span> MapBuild&lt;K, V&gt; <span class="title">put</span><span class="params">(K key, Integer integer)</span> </span>&#123;</span><br><span class="line">		map.put(key, (V) integer);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> MapBuild&lt;K, V&gt; <span class="title">putAll</span><span class="params">(Map&lt;? extends K, ? extends V&gt; m)</span> </span>&#123;</span><br><span class="line">		map.putAll(m);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> MapBuild&lt;K, V&gt; <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		map.clear();</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Set&lt;K&gt; <span class="title">keySet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.keySet();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Collection&lt;V&gt; <span class="title">values</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.values();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> Set&lt;Entry&lt;K, V&gt;&gt; entrySet() &#123;</span><br><span class="line">		<span class="keyword">return</span> map.entrySet();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.equals(o);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map.hashCode();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Map&lt;K, V&gt; <span class="title">build</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> map;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>欣赏此文？求鼓励，求支持！</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="jiangfumei 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="jiangfumei 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>jiangfumei
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://jiangfumei.github.io/2020/03/19/tecent-im/" title="即时通讯IM">https://jiangfumei.github.io/2020/03/19/tecent-im/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9/" rel="tag"># 第三方</a>
+              <a href="/tags/%E8%85%BE%E8%AE%AFIM/" rel="tag"># 腾讯IM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/08/springcloud-gateway%E5%90%AF%E5%8A%A8%E5%BC%82%E5%B8%B8/" rel="prev" title="springcloud gateway异常">
+      <i class="fa fa-chevron-left"></i> springcloud gateway异常
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/03/20/vue/" rel="next" title="vue">
+      vue <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Api调用"><span class="nav-number">2.</span> <span class="nav-text">Api调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备工作"><span class="nav-number">2.1.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码"><span class="nav-number">2.2.</span> <span class="nav-text">代码</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="jiangfumei"
+      src="/images/hade.jpg">
+  <p class="site-author-name" itemprop="name">jiangfumei</p>
+  <div class="site-description" itemprop="description">學無止境，氣有浩然</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">30</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/jiangfumei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;jiangfumei" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:fumeijiang666@gmail.com" title="E-Mail → mailto:fumeijiang666@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/JFM%C3%B7UP" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;JFM÷UP" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://plus.google.com/fumeijiang666" title="Google → https:&#x2F;&#x2F;plus.google.com&#x2F;fumeijiang666" rel="noopener" target="_blank"><i class="fa fa-fw fa-google"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://waver.me/" title="https:&#x2F;&#x2F;waver.me&#x2F;" rel="noopener" target="_blank">waver</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://ehlxr.me/" title="https:&#x2F;&#x2F;ehlxr.me&#x2F;" rel="noopener" target="_blank">ehlxr</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://blog.didispace.com/" title="http:&#x2F;&#x2F;blog.didispace.com" rel="noopener" target="_blank">程序员DD</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://www.fangzhipeng.com/" title="https:&#x2F;&#x2F;www.fangzhipeng.com&#x2F;" rel="noopener" target="_blank">方志朋</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="http://www.ityouknow.com/" title="http:&#x2F;&#x2F;www.ityouknow.com" rel="noopener" target="_blank">纯洁的微笑</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">by jiangfumei</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el: '#valine-comments',
+      verify: false,
+      notify: false,
+      appId: '6nnjNCU2uosA1eXry8i8DXaM-gzGzoHsz',
+      appKey: 'Cq81iddtrhNg4ooyofXIUUBL',
+      placeholder: "Just go go",
+      avatar: 'robohash',
+      meta: guest,
+      pageSize: '10' || 10,
+      visitor: false,
+      lang: '' || 'zh-cn',
+      path: location.pathname,
+      recordIP: false,
+      serverURLs: ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
