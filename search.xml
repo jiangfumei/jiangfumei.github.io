@@ -591,26 +591,6 @@ google配置类<code>GooglePayConfig.java</code>:</p>
       </tags>
   </entry>
   <entry>
-    <title>Docker之Dockfile</title>
-    <url>/2019/11/14/docker-dockerfile/</url>
-    <content><![CDATA[<h2 id="Dockerfile是什么？">Dockerfile是什么？</h2>
-<p>Docker可以通过阅读Dockerfile中的指令来自动构建映像。 Dockerfile是一个文本文档，其中包含用户可以在命令行上调用以组装映像的所有命令。使用docker build的用户可以创建自动执行的构建，该构建可以连续执行几个命令行指令。</p>
-<h2 id="构建springboot项目模版">构建springboot项目模版</h2>
-<a id="more"></a>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">FROM openjdk:<span class="number">8</span></span><br><span class="line">VOLUME /tmp</span><br><span class="line"></span><br><span class="line">ARG JAR=app.jar</span><br><span class="line"></span><br><span class="line">ENV SPRING_PROFILES_ACTIVE=online</span><br><span class="line">ENV TZ=Asia/Shanghai</span><br><span class="line"></span><br><span class="line">RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &amp;&amp; echo $TZ &gt; /etc/timezone</span><br><span class="line"></span><br><span class="line">ADD config/ /opt/app/</span><br><span class="line">ADD $JAR /opt/app/app.jar</span><br><span class="line"></span><br><span class="line">EXPOSE <span class="number">8080</span></span><br><span class="line">WORKDIR /opt/app/</span><br><span class="line"></span><br><span class="line">CMD [ <span class="string">"/usr/local/openjdk-8/bin/java"</span>, <span class="string">"-Djava.security.egd=file:/dev/urandom"</span>, <span class="string">"-jar"</span>, <span class="string">"/opt/app/app.jar"</span> ]</span><br></pre></td></tr></table></figure>
-<h2 id="usage">usage</h2>
-<p>demo:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.&#x2F;deploy.sh ready-to-deploy.jar .&#x2F;config-directory&#x2F; docker-cotainer-name</span><br></pre></td></tr></table></figure>
-<p>SPRING_PROFILES_ACTIVE is “online”, Server port is config IN application-online.yml / application-online.properties with default.</p>
-]]></content>
-      <categories>
-        <category>Docker</category>
-      </categories>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Docker之部署脚本.deploysh</title>
     <url>/2019/11/14/docker-deploysh/</url>
     <content><![CDATA[<h2 id="说明">说明</h2>
@@ -635,6 +615,26 @@ conf是和jar包基于同级目录的配置目录，conf目录下放springboot�
 <h2 id="usage">usage</h2>
 <p>demo:</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">./deploy.sh ready-to-deploy.jar ./config-directory/ docker-cotainer-name</span><br></pre></td></tr></table></figure>
+<p>SPRING_PROFILES_ACTIVE is “online”, Server port is config IN application-online.yml / application-online.properties with default.</p>
+]]></content>
+      <categories>
+        <category>Docker</category>
+      </categories>
+      <tags>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Docker之Dockfile</title>
+    <url>/2019/11/14/docker-dockerfile/</url>
+    <content><![CDATA[<h2 id="Dockerfile是什么？">Dockerfile是什么？</h2>
+<p>Docker可以通过阅读Dockerfile中的指令来自动构建映像。 Dockerfile是一个文本文档，其中包含用户可以在命令行上调用以组装映像的所有命令。使用docker build的用户可以创建自动执行的构建，该构建可以连续执行几个命令行指令。</p>
+<h2 id="构建springboot项目模版">构建springboot项目模版</h2>
+<a id="more"></a>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">FROM openjdk:<span class="number">8</span></span><br><span class="line">VOLUME /tmp</span><br><span class="line"></span><br><span class="line">ARG JAR=app.jar</span><br><span class="line"></span><br><span class="line">ENV SPRING_PROFILES_ACTIVE=online</span><br><span class="line">ENV TZ=Asia/Shanghai</span><br><span class="line"></span><br><span class="line">RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime &amp;&amp; echo $TZ &gt; /etc/timezone</span><br><span class="line"></span><br><span class="line">ADD config/ /opt/app/</span><br><span class="line">ADD $JAR /opt/app/app.jar</span><br><span class="line"></span><br><span class="line">EXPOSE <span class="number">8080</span></span><br><span class="line">WORKDIR /opt/app/</span><br><span class="line"></span><br><span class="line">CMD [ <span class="string">"/usr/local/openjdk-8/bin/java"</span>, <span class="string">"-Djava.security.egd=file:/dev/urandom"</span>, <span class="string">"-jar"</span>, <span class="string">"/opt/app/app.jar"</span> ]</span><br></pre></td></tr></table></figure>
+<h2 id="usage">usage</h2>
+<p>demo:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.&#x2F;deploy.sh ready-to-deploy.jar .&#x2F;config-directory&#x2F; docker-cotainer-name</span><br></pre></td></tr></table></figure>
 <p>SPRING_PROFILES_ACTIVE is “online”, Server port is config IN application-online.yml / application-online.properties with default.</p>
 ]]></content>
       <categories>
