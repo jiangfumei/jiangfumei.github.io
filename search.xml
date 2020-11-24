@@ -607,7 +607,10 @@ HashTable是线程安全的<br>
 我们都知道Map一般都是数组+链表结构（JDK1.8该为数组+红黑树）。<br>
 高并发编程系列：ConcurrentHashMap的实现原理(JDK1.7和JDK1.8)<br>
 ConcurrentHashMap避免了对全局加锁改成了局部加锁操作，这样就极大地提高了并发环境下的操作速度，由于ConcurrentHashMap在JDK1.7和1.8中的实现非常不同，接下来我们谈谈JDK在1.7和1.8中的区别。</p>
-]]></content>
+<a id="more"></a>
+<h2 id="源码解析">源码解析</h2>
+<h3 id="基本属性">基本属性</h3>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAXIMUM_CAPACITY = <span class="number">1</span> &lt;&lt; <span class="number">30</span>;</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>Java</category>
         <category>Java基础</category>
