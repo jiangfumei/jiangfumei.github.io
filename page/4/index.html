@@ -140,17 +140,17 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">21</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">24</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">18</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">20</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">32</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">36</span></a>
 
   </li>
         <li class="menu-item menu-item-comments">
@@ -212,6 +212,406 @@
             
 
   <div class="posts-expand">
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jiangfumei.github.io/2019/01/02/jpa%E6%8C%81%E4%B9%85%E5%8C%96%E7%94%9F%E5%91%BD%E7%8A%B6%E6%80%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hade.jpg">
+      <meta itemprop="name" content="jiangfumei">
+      <meta itemprop="description" content="學無止境，氣有浩然">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Struggler's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/01/02/jpa%E6%8C%81%E4%B9%85%E5%8C%96%E7%94%9F%E5%91%BD%E7%8A%B6%E6%80%81/" class="post-title-link" itemprop="url">JPA hibernate的持久化生命状态</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-02 10:46:19" itemprop="dateCreated datePublished" datetime="2019-01-02T10:46:19+08:00">2019-01-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-09 14:14:42" itemprop="dateModified" datetime="2020-04-09T14:14:42+08:00">2020-04-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/01/02/jpa%E6%8C%81%E4%B9%85%E5%8C%96%E7%94%9F%E5%91%BD%E7%8A%B6%E6%80%81/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/01/02/jpa%E6%8C%81%E4%B9%85%E5%8C%96%E7%94%9F%E5%91%BD%E7%8A%B6%E6%80%81/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="开篇">开篇</h2>
+<p>某日写程序时，使用jpa操作数据库，当我使用<code>findAll（）</code>方法查处一个List的对象后，给对这个list的实体进行了一些操作，并没有调用<code>update</code> 或者 <code>saveOrUpdate</code>方法，更改后的数据却神奇的保存到数据库里面去了😕😕😕我也在service层添加事物了啊。后面找了资料才发现是jpa是对hibernate的封装，底层是hibernate，这是hibernate的持久状态搞的鬼。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/01/02/jpa%E6%8C%81%E4%B9%85%E5%8C%96%E7%94%9F%E5%91%BD%E7%8A%B6%E6%80%81/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jiangfumei.github.io/2018/12/27/nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hade.jpg">
+      <meta itemprop="name" content="jiangfumei">
+      <meta itemprop="description" content="學無止境，氣有浩然">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Struggler's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/12/27/nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/" class="post-title-link" itemprop="url">Nginx域名转发</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-27 17:16:13" itemprop="dateCreated datePublished" datetime="2018-12-27T17:16:13+08:00">2018-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-31 11:04:11" itemprop="dateModified" datetime="2019-12-31T11:04:11+08:00">2019-12-31</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">Nginx</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/12/27/nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/12/27/nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="nginx-conf配置文件">nginx.conf配置文件</h2>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> For more information on configuration, see:</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   * Official English Documentation: http://nginx.org/en/docs/</span></span><br><span class="line"><span class="meta">#</span><span class="bash">   * Official Russian Documentation: http://nginx.org/ru/docs/</span></span><br><span class="line"></span><br><span class="line">user nginx;</span><br><span class="line">worker_processes auto;</span><br><span class="line">error_log /var/log/nginx/error.log;</span><br><span class="line">pid /run/nginx.pid;</span><br><span class="line">&lt;!-- more --&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.</span></span><br><span class="line">include /usr/share/nginx/modules/*.conf;</span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections 1024;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '</span><br><span class="line">                      '$status $body_bytes_sent "$http_referer" '</span><br><span class="line">                      '"$http_user_agent" "$http_x_forwarded_for"';</span><br><span class="line"></span><br><span class="line">    access_log  /var/log/nginx/access.log  main;</span><br><span class="line"></span><br><span class="line">    sendfile            on;</span><br><span class="line">    tcp_nopush          on;</span><br><span class="line">    tcp_nodelay         on;</span><br><span class="line">    keepalive_timeout   65;</span><br><span class="line">    types_hash_max_size 2048;</span><br><span class="line"></span><br><span class="line">    include             /etc/nginx/mime.types;</span><br><span class="line">    default_type        application/octet-stream;</span><br><span class="line"></span><br><span class="line">    # Load modular configuration files from the /etc/nginx/conf.d directory.</span><br><span class="line">    # See http://nginx.org/en/docs/ngx_core_module.html#include</span><br><span class="line">    # for more information.</span><br><span class="line">    include /etc/nginx/conf.d/*.conf;</span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">        listen       80;</span><br><span class="line">        listen       [::]:80;</span><br><span class="line">        server_name  _;</span><br><span class="line">        root         /usr/share/nginx/html;</span><br><span class="line"></span><br><span class="line">        # Load configuration files for the default server block.</span><br><span class="line">        include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        error_page 404 /404.html;</span><br><span class="line">            location = /40x.html &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        error_page 500 502 503 504 /50x.html;</span><br><span class="line">            location = /50x.html &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Settings <span class="keyword">for</span> a TLS enabled server.</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span><span class="bash">    server &#123;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        listen       443 ssl http2 default_server;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        listen       [::]:443 ssl http2 default_server;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        server_name  _;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        root         /usr/share/nginx/html;</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        ssl_certificate <span class="string">"/etc/pki/nginx/server.crt"</span>;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        ssl_certificate_key <span class="string">"/etc/pki/nginx/private/server.key"</span>;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        ssl_session_cache shared:SSL:1m;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        ssl_session_timeout  10m;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        ssl_ciphers HIGH:!aNULL:!MD5;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        ssl_prefer_server_ciphers on;</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        <span class="comment"># Load configuration files for the default server block.</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">        include /etc/nginx/default.d/*.conf;</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        location / &#123;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        &#125;</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        error_page 404 /404.html;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">            location = /40x.html &#123;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        &#125;</span></span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        error_page 500 502 503 504 /50x.html;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">            location = /50x.html &#123;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">        &#125;</span></span><br><span class="line"><span class="meta">#</span><span class="bash">    &#125;</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>include /etc/nginx/conf.d/*.conf</code>; //引入/etc/nginx/conf.d/下的所有.conf子配置文件 注意这条很重要，因为在默认配置中没有server段的配置，而一般都是将server的配置放在/etc/nginx/conf.d/目录下。<br>
+正常情况下http段配置结构如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">      ...</span><br><span class="line">    server &#123;</span><br><span class="line">          ...</span><br><span class="line">        location [PATTERN]  &#123;</span><br><span class="line">               ...</span><br><span class="line">        &#125;</span><br><span class="line">        location [PATTERN]  &#123;</span><br><span class="line">              ...</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">  server &#123;</span><br><span class="line">         ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Nginx的相关命令和服务启动加载<br>
+<code>nginx  -s  reload </code> ：重新加载nginx的配置文件；</p>
+<p><code>nginx  -t</code>：检查配置文件语法是否有问题；</p>
+<p>Nginx服务启动、停止、重新加载</p>
+<p>#service nginx start  | stop | reload</p>
+<p>#/etc/init.d/nginx  start | stop | reload</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">sites-enabled</span><br><span class="line">这里面的配置文件其实就是sites-available里面的配置文件的软</span><br><span class="line">连接,但是由于nginx.conf默认包含的是这个文件夹,所以我们在</span><br><span class="line">sites-available里面建立了新的站点之后,还要建立个软连接到sites-enabled里面才行</span><br><span class="line"></span><br><span class="line">sites-available</span><br><span class="line">这里是我们的虚拟主机的目录，我们在在这里面可以创建多个虚拟主机.</span><br><span class="line">## </span><br><span class="line">在conf.d下面配置我的两个配置文件</span><br><span class="line">aaa.conf</span><br><span class="line">&#96;&#96;&#96;shell</span><br><span class="line">upstream gooneserver  &#123;</span><br><span class="line">    server 127.0.0.1:8580;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">	listen       80 default_server;</span><br><span class="line">	server_name  www.rizin.fun rizin.fun;</span><br><span class="line"></span><br><span class="line">	access_log  &#x2F;var&#x2F;log&#x2F;nginx&#x2F;goone.access.log  main;</span><br><span class="line">	error_log  &#x2F;var&#x2F;log&#x2F;nginx&#x2F;goone.error.log;</span><br><span class="line"></span><br><span class="line">        root         &#x2F;usr&#x2F;share&#x2F;nginx&#x2F;html;</span><br><span class="line">	index  index.html index.htm index.php;</span><br><span class="line"></span><br><span class="line">	## send request back to apache ##</span><br><span class="line">	location &#x2F; &#123;</span><br><span class="line">		proxy_pass  http:&#x2F;&#x2F;gooneserver;</span><br><span class="line"></span><br><span class="line">		#Proxy Settings</span><br><span class="line">		proxy_redirect     off;</span><br><span class="line">		proxy_set_header   Host             $host;</span><br><span class="line">		proxy_set_header   X-Real-IP        $remote_addr;</span><br><span class="line">		proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;</span><br><span class="line">		proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;</span><br><span class="line">		proxy_max_temp_file_size 0;</span><br><span class="line">		proxy_connect_timeout      90;</span><br><span class="line">		proxy_send_timeout         90;</span><br><span class="line">		proxy_read_timeout         90;</span><br><span class="line">		proxy_buffer_size          4k;</span><br><span class="line">		proxy_buffers              4 32k;</span><br><span class="line">		proxy_busy_buffers_size    64k;</span><br><span class="line">		proxy_temp_file_write_size 64k;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>yyy.conf</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">upstream gooneadminserver  &#123;</span><br><span class="line">    server 127.0.0.1:8581;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">	listen       80;</span><br><span class="line">	server_name  admin.rizin.fun;</span><br><span class="line"></span><br><span class="line">	access_log  /var/log/nginx/admin.goone.access.log  main;</span><br><span class="line">	error_log  /var/log/nginx/admin.goone.error.log;</span><br><span class="line"></span><br><span class="line">        root         /usr/share/nginx/html;</span><br><span class="line">	index  index.html index.htm index.php;</span><br><span class="line"></span><br><span class="line"><span class="meta">	#</span><span class="bash"><span class="comment"># send request back to apache ##</span></span></span><br><span class="line">	location / &#123;</span><br><span class="line">		proxy_pass  http://gooneadminserver;</span><br><span class="line"></span><br><span class="line"><span class="meta">		#</span><span class="bash">Proxy Settings</span></span><br><span class="line">		proxy_redirect     off;</span><br><span class="line">		proxy_set_header   Host             $host;</span><br><span class="line">		proxy_set_header   X-Real-IP        $remote_addr;</span><br><span class="line">		proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;</span><br><span class="line">		proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;</span><br><span class="line">		proxy_max_temp_file_size 0;</span><br><span class="line">		proxy_connect_timeout      90;</span><br><span class="line">		proxy_send_timeout         90;</span><br><span class="line">		proxy_read_timeout         90;</span><br><span class="line">		proxy_buffer_size          4k;</span><br><span class="line">		proxy_buffers              4 32k;</span><br><span class="line">		proxy_busy_buffers_size    64k;</span><br><span class="line">		proxy_temp_file_write_size 64k;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jiangfumei.github.io/2018/10/27/springbootjunittest/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hade.jpg">
+      <meta itemprop="name" content="jiangfumei">
+      <meta itemprop="description" content="學無止境，氣有浩然">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Struggler's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/10/27/springbootjunittest/" class="post-title-link" itemprop="url">SpringBoot Junit Restful Api 测试用例</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-27 10:15:48" itemprop="dateCreated datePublished" datetime="2018-10-27T10:15:48+08:00">2018-10-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-22 15:50:05" itemprop="dateModified" datetime="2020-04-22T15:50:05+08:00">2020-04-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/10/27/springbootjunittest/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/10/27/springbootjunittest/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Controller的单元测试">Controller的单元测试</h2>
+<h3 id="第一种使用模拟环境进行测试">第一种使用模拟环境进行测试</h3>
+<h4 id="原理">原理</h4>
+<p>使用<code>MockMvc</code>发起请求，然后执行API中相应的代码，在执行的过程中使mock模拟底层数据的返回，最后结果验证。<br>
+<code>Spring</code>测试框架提供<code>MockMvc</code>对象，可以在不需要客户端-服务端请求的情况下进行MVC测试，完全在服务端这边就可以执行<code>Controller</code>的请求，跟启动了测试服务器一样。<br>
+测试开始之前需要建立测试环境，<code>setup</code>方法被<code>@Before</code>修饰。通过<code>MockMvcBuilders</code>工具，使用<code>WebApplicationContext</code>对象作为参数，创建一个<code>MockMvc</code>对象。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/10/27/springbootjunittest/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+        
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://jiangfumei.github.io/2018/07/28/hexo%E9%83%A8%E7%BD%B2%E6%8E%A8%E8%8D%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/hade.jpg">
+      <meta itemprop="name" content="jiangfumei">
+      <meta itemprop="description" content="學無止境，氣有浩然">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Struggler's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          
+            <a href="/2018/07/28/hexo%E9%83%A8%E7%BD%B2%E6%8E%A8%E8%8D%90/" class="post-title-link" itemprop="url">hexo部署推荐</a>
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-28 17:12:35" itemprop="dateCreated datePublished" datetime="2018-07-28T17:12:35+08:00">2018-07-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-09 14:09:48" itemprop="dateModified" datetime="2020-04-09T14:09:48+08:00">2020-04-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hexo/" itemprop="url" rel="index">
+                    <span itemprop="name">hexo</span>
+                  </a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2018/07/28/hexo%E9%83%A8%E7%BD%B2%E6%8E%A8%E8%8D%90/#comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2018/07/28/hexo%E9%83%A8%E7%BD%B2%E6%8E%A8%E8%8D%90/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一个博客为什么要建两个仓库">一个博客为什么要建两个仓库</h2>
+<p>之前我的博客就一个仓库，还是公有的，那么问题来了，我发布文章部署之后所有人都可以看我的源码及配置文件😟。这是绝对不能允许的，并不是小编我太小气，就是怕有些投机取巧不劳而获的人直接copy我的源码发表，岂不是便宜了他，这样的人大家都不喜欢吧？好了，废话少说，开始步入正题😀。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2018/07/28/hexo%E9%83%A8%E7%BD%B2%E6%8E%A8%E8%8D%90/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
         
   
   
@@ -497,20 +897,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-count">36</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
