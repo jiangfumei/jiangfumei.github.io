@@ -4,24 +4,11 @@
   
     
     <entry>
-      <title>Spring源码</title>
-      <link href="/2020/12/04/Spring%E6%BA%90%E7%A0%81/"/>
-      <url>/2020/12/04/Spring%E6%BA%90%E7%A0%81/</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>antd vue pro delete mockjs (user login)</title>
       <link href="/2020/11/22/antd-vue-pro-delete-mockjs-user-login/"/>
       <url>/2020/11/22/antd-vue-pro-delete-mockjs-user-login/</url>
       
-        <content type="html"><![CDATA[<h2 id="背景介绍">背景介绍</h2><p>下载了开源的antd vue pro源码用于后台管理系统的开发，但是原项目中是使用mockjs数据模拟后台管理用户登入系统的。在没有做七牛云上传文件之前，需求是不需要去掉mockjs模拟数据的。但是在接入七牛云上传之后，点击上传时总是报错<code>Uncaught TypeError: this.xhr.upload.addEventListener is not a function</code>,在网上查找资料后，得到原因如下：</p><a id="more"></a><p>mockjs是一个模拟后台接口的JS库，它的原理是重写了XMLHttpRequest，它可以在接口没出来时非常方便的模拟数据，上线之后不引用它即可。一般上报插件中会使用原生XMLHttpRequest，而原生XMLHttpRequest已被mockjs覆盖找不到相应的方法，所以会出错。除了mockjs之外，zonejs、oboejs、fetchjs也有自己的的XMLHttpRequest库，请慎用<br>解决办法：<br>直接弃用了mockjs</p><h2 id="解决过程">解决过程</h2><p>main.js文件<br><img src="/images/mock_mainjs.png" alt=""><br>package.json文件删除mockjs依赖<br><img src="/images/mock_package.png" alt=""><br>user.js文件<br><img src="/images/mock_userjs.png" alt=""><br>根据后台返回的用户信息json数据来取值<br>permission.js文件<br><img src="/images/mock_permissionjs.png" alt=""><br>login.js文件<br><img src="/images/mock_loginjs.png" alt=""><br>router.config.js修改菜单权限<br><img src="/images/mock_routeconfig.png" alt=""></p>]]></content>
+        <content type="html"><![CDATA[<h2 id="背景介绍">背景介绍</h2><p>下载了开源的antd vue pro源码用于后台管理系统的开发，但是原项目中是使用mockjs数据模拟后台管理用户登入系统的。在没有做七牛云上传文件之前，需求是不需要去掉mockjs模拟数据的。但是在接入七牛云上传之后，点击上传时总是报错<code>Uncaught TypeError: this.xhr.upload.addEventListener is not a function</code>,在网上查找资料后，得到原因如下：</p><a id="more"></a><p>mockjs是一个模拟后台接口的JS库，它的原理是重写了XMLHttpRequest，它可以在接口没出来时非常方便的模拟数据，上线之后不引用它即可。一般上报插件中会使用原生XMLHttpRequest，而原生XMLHttpRequest已被mockjs覆盖找不到相应的方法，所以会出错。除了mockjs之外，zonejs、oboejs、fetchjs也有自己的的XMLHttpRequest库，请慎用<br>解决办法：<br>直接弃用了mockjs</p><h2 id="解决过程">解决过程</h2><p>main.js文件<br><img src="/images/mock_mainjs.png" alt=""><br>package.json文件删除mockjs依赖<br><img src="/images/mock_package.png" alt=""><br>user.js文件<br><img src="/images/mock_userjs.png" alt=""><br>根据后台返回的用户信息json数据来取值<br>permission.js文件<br><img src="/images/mock_permissionjs.png" alt=""><br>login.js文件<br><img src="/images/mock_loginjs.png" alt=""><br>router.config.js修改菜单权限<br><img src="/images/mocj_routeconfig.png" alt=""></p>]]></content>
       
       
       <categories>
@@ -477,6 +464,19 @@
             <tag> Java </tag>
             
         </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Spring源码</title>
+      <link href="/2019/12/04/Spring%E6%BA%90%E7%A0%81/"/>
+      <url>/2019/12/04/Spring%E6%BA%90%E7%A0%81/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
       
     </entry>
     
