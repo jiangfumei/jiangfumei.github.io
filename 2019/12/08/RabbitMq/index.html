@@ -59,10 +59,11 @@
 <meta property="og:image" content="https://jiangfumei.github.io/images/producer-consumer.png">
 <meta property="og:image" content="https://jiangfumei.github.io/images/ptjq.jpg">
 <meta property="og:image" content="https://jiangfumei.github.io/images/rmgky.jpg">
+<meta property="og:image" content="https://jiangfumei.github.io/images/policy.png">
 <meta property="og:image" content="https://jiangfumei.github.io/images/kafka.jpg">
 <meta property="og:image" content="https://jiangfumei.github.io/images/kafkagky.jpg">
 <meta property="article:published_time" content="2019-12-08T07:37:41.000Z">
-<meta property="article:modified_time" content="2020-12-15T10:31:24.838Z">
+<meta property="article:modified_time" content="2020-12-23T05:30:18.553Z">
 <meta property="article:author" content="jiangfumei">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="Java高并发">
@@ -162,7 +163,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">36</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">37</span></a>
 
   </li>
         <li class="menu-item menu-item-comments">
@@ -258,7 +259,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-15 18:31:24" itemprop="dateModified" datetime="2020-12-15T18:31:24+08:00">2020-12-15</time>
+                <time title="修改时间：2020-12-23 13:30:18" itemprop="dateModified" datetime="2020-12-23T13:30:18+08:00">2020-12-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -309,11 +310,11 @@
 <a id="more"></a>
 <h2 id="为什么使用消息队列">为什么使用消息队列</h2>
 <p>主要有三个作用：</p>
-<h3 id="解耦">* 解耦</h3>
+<h3 id="应用解耦">* 应用解耦</h3>
 <p>将消息写入消息队列，需要消息的系统自己从消息队列中订阅,从而系统A不需要做任何修改</p>
-<h3 id="异步">* 异步</h3>
+<h3 id="异步处理">* 异步处理</h3>
 <p>将消息写入消息队列，非必要的业务逻辑以异步的方式运行，加快响应速度</p>
-<h3 id="削峰">* 削峰</h3>
+<h3 id="流量削峰">* 流量削峰</h3>
 <p>系统A慢慢的按照数据库能处理的并发量，从消息队列中慢慢拉取消息。在生产中，这个短暂的高峰期积压是允许的。</p>
 <h2 id="主流的MQ，如：kafka、rabbitmq、rocketmq、activemq">主流的MQ，如：kafka、rabbitmq、rocketmq、activemq</h2>
 <p><img src="/images/messageque.jpg" alt=""></p>
@@ -331,12 +332,18 @@
 <li>Exchange（交换器）：用于接受、分配消息。</li>
 <li>Queue（队列）：用于存储生产者的消息。RoutingKey（路由键）：用于把生成者的数据分配到交换器上。BindingKey（绑定键）：用于把交换器的消息绑定到队列上。</li>
 <li>RoutingKey（路由键）：用于把生成者的数据分配到交换器上。</li>
-<li>BindingKey（绑定键）：用于把交换器的消息绑定到队列上。<br>
-消息推送到接收的过程：<br>
+<li>BindingKey（绑定键）：用于把交换器的消息绑定到队列上。</li>
+</ul>
+<p>“ConnectionFactory”、“Connection”、&quot;Channel&quot;都是RabbitMQ对外提供的API中最基本的对象。</p>
+<ul>
+<li>Connection 是 RabbitMQ 的 socket 链接，它封装了socket 协议相关部分逻辑。</li>
+<li>ConnectionFactory 为 Connection 的制造工厂。</li>
+<li>Channel 是我们与 RabbitMQ 打交道的最重要的一个接口，我们大部分的业务操作是在 Channel 这个接口中完成的，包括定义Queue、定义Exchange、绑定 Queue 与 Exchange、发布消息等。</li>
+</ul>
+<p>消息推送到接收的过程：<br>
 <img src="/images/producer-consumer.png" alt=""><br>
 黄色的圈圈就是我们的消息推送服务，将消息推送到 中间方框里面也就是 rabbitMq的服务器，然后经过服务器里面的交换机、队列等各种关系（后面会详细讲）将数据处理入列后，最终右边的蓝色圈圈消费者获取对应监听的消息。<br>
-常用的交换机有以下三种，因为消费者是从队列获取信息的，队列是绑定交换机的（一般），所以对应的消息推送/接收模式也会有以下几种：</li>
-</ul>
+常用的交换机有以下三种，因为消费者是从队列获取信息的，队列是绑定交换机的（一般），所以对应的消息推送/接收模式也会有以下几种：</p>
 <h4 id="Direct-Exchange">Direct Exchange</h4>
 <p>直连型交换机，根据消息携带的路由键将消息投递给对应队列。<br>
 大致流程，有一个队列绑定到一个直连交换机上，同时赋予一个路由键 routing key 。<br>
@@ -353,7 +360,8 @@
 如果一条消息携带的路由键为 A.TT.B，那么队列Q1将会收到；<br>
 <a href="http://xn--TT-uu2cyis92cyrg89d7xjqsh2qag53cpvv53d9v2ibzwa.AA.BB" target="_blank" rel="noopener">如果一条消息携带的路由键为TT.AA.BB</a>，那么队列Q2将会收到；</p>
 <h2 id="消息交换器">消息交换器</h2>
-<p>RabbitMQ消息交换器需要重点注意的是RabbitMQ支持临时和持久两种订阅类型。消费者可以调用RabbitMQ的API来选择他们想要的订阅类型。根据RabbitMQ的架构设计，我们也可以创建一种混合方法——订阅者以组队的方式然后在组内以竞争关系作为消费者去处理某个具体队列上的消息，这种由订阅者构成的组我们称为消费者组。按照这种方式，我们实现了发布/订阅模式，同时也能够很好的伸缩（scale-up）订阅者去处理收到的消息。</p>
+<p>交换器，用来接收生产者发送的消息并将这些小西路有给服务器中的队列。<br>
+RabbitMQ消息交换器需要重点注意的是RabbitMQ支持临时和持久两种订阅类型。消费者可以调用RabbitMQ的API来选择他们想要的订阅类型。根据RabbitMQ的架构设计，我们也可以创建一种混合方法——订阅者以组队的方式然后在组内以竞争关系作为消费者去处理某个具体队列上的消息，这种由订阅者构成的组我们称为消费者组。按照这种方式，我们实现了发布/订阅模式，同时也能够很好的伸缩（scale-up）订阅者去处理收到的消息。</p>
 <h2 id="RabbitMq的高可用性">RabbitMq的高可用性</h2>
 <p>RabbitMQ 是比较有代表性的，因为是基于主从（非分布式）做高可用性的<br>
 RabbitMQ 有三种模式：单机模式、普通集群模式、镜像集群模式。</p>
@@ -370,6 +378,14 @@ RabbitMQ 有三种模式：单机模式、普通集群模式、镜像集群模�
 <img src="/images/rmgky.jpg" alt=""><br>
 那么如何开启这个镜像集群模式呢？其实很简单，RabbitMQ 有很好的管理控制台，就是在后台新增一个策略，这个策略是镜像集群模式的策略，指定的时候是可以要求数据同步到所有节点的，也可以要求同步到指定数量的节点，再次创建 queue 的时候，应用这个策略，就会自动将数据同步到其他的节点上去了。<br>
 这样的话，好处在于，你任何一个机器宕机了，没事儿，其它机器（节点）还包含了这个 queue 的完整数据，别的 consumer 都可以到其它节点上去消费数据。坏处在于，第一，这个性能开销也太大了吧，消息需要同步到所有机器上，导致网络带宽压力和消耗很重！第二，这么玩儿，不是分布式的，就没有扩展性可言了，如果某个 queue 负载很重，你加机器，新增的机器也包含了这个 queue 的所有数据，并没有办法线性扩展你的 queue。你想，如果这个 queue 的数据量很大，大到这个机器上的容量无法容纳了，此时该怎么办呢？</p>
+<h4 id="添加策略模式有两种方式">添加策略模式有两种方式</h4>
+<h5 id="管理页面添加">管理页面添加</h5>
+<p>admin-&gt;Policies&gt;add policy 参数解释： name: 策略名称 Pattern：通配符，创建的队列名称如果匹配到这个通配符，则使用该策略，如^匹配所有队列 Definition: 设置复制模式 我这里设置的配置如下<br>
+<img src="/images/policy.png" alt=""></p>
+<h5 id="通过命令方式添加">通过命令方式添加</h5>
+<p>可以在任意节点执行如下命令，我这里是在从节点1上执行的，它会自动在集群中同步<br>
+<code>docker exec -it rabbitmq_slave1 bash rabbitmqctl set_policy my_ha &quot;^&quot; '{&quot;ha-mode&quot;:&quot;all&quot;}' exit </code><br>
+到这里，集群已经真正的搭建完成了，我们现在看下如何在项目中整合吧！</p>
 <h2 id="Kafka-的高可用性">Kafka 的高可用性</h2>
 <p>Kafka 一个最基本的架构认识：由多个 broker 组成，每个 broker 是一个节点；你创建一个 topic，这个 topic 可以划分为多个 partition，每个 partition 可以存在于不同的 broker 上，每个 partition 就放一部分数据。这就是天然的分布式消息队列，就是说一个 topic 的数据，是分散放在多个机器上的，每个机器就放一部分数据。<br>
 实际上 RabbitMQ 之类的，并不是分布式消息队列，它就是传统的消息队列，只不过提供了一些集群、HA(High Availability, 高可用性) 的机制而已，因为无论怎么玩儿，RabbitMQ 一个 queue 的数据都是放在一个节点里的，镜像集群下，也是每个节点都放这个 queue 的完整数据。<br>
@@ -378,6 +394,69 @@ Kafka 0.8 以前，是没有 HA 机制的，就是任何一个 broker 宕机了�
 Kafka 0.8 以后，提供了 HA 机制，就是 replica（复制品） 副本机制。每个 partition 的数据都会同步到其它机器上，形成自己的多个 replica 副本。所有 replica 会选举一个 leader 出来，那么生产和消费都跟这个 leader 打交道，然后其他 replica 就是 follower。写的时候，leader 会负责把数据同步到所有 follower 上去，读的时候就直接读 leader 上的数据即可。只能读写 leader？很简单，要是你可以随意读写每个 follower，那么就要 care 数据一致性的问题，系统复杂度太高，很容易出问题。Kafka 会均匀地将一个 partition 的所有 replica 分布在不同的机器上，这样才可以提高容错性。<br>
 <img src="/images/kafkagky.jpg" alt=""></p>
 <p>这么搞，就有所谓的高可用性了，因为如果某个 broker 宕机了，没事儿，那个 broker 上面的 partition 在其他机器上都有副本的。如果这个宕机的 broker 上面有某个 partition 的 leader，那么此时会从 follower 中重新选举一个新的 leader 出来，大家继续读写那个新的 leader 即可。这就有所谓的高可用性了。写数据的时候，生产者就写 leader，然后 leader 将数据落地写本地磁盘，接着其他 follower 自己主动从 leader 来 pull 数据。一旦所有 follower 同步好数据了，就会发送 ack 给 leader，leader 收到所有 follower 的 ack 之后，就会返回写成功的消息给生产者。（当然，这只是其中一种模式，还可以适当调整这个行为）消费的时候，只会从 leader 去读，但是只有当一个消息已经被所有 follower 都同步成功返回 ack 的时候，这个消息才会被消费者读到。看到这里，相信你大致明白了 Kafka 是如何保证高可用机制的了，对吧？不至于一无所知，现场还能给面试官画画图。要是遇上面试官确实是 Kafka 高手，深挖了问，那你只能说不好意思，太深入的你没研究过。</p>
+<h2 id="如何确保消息的可靠性传输（消息不被丢失）？">如何确保消息的可靠性传输（消息不被丢失）？</h2>
+<p>RabbitMQ为我们提供了两种方式：</p>
+<ol>
+<li>通过AMQP事务机制实现，这也是AMQP协议层面提供的解决方案；</li>
+<li>通过将channel设置成confirm模式来实现；</li>
+</ol>
+<h3 id="事务机制">事务机制</h3>
+<p>这里首先探讨下RabbitMQ事务机制。<br>
+RabbitMQ中与事务机制有关的方法有三个：txSelect(), txCommit()以及txRollback(), txSelect用于将当前channel设置成transaction模式，txCommit用于提交事务，txRollback用于回滚事务，在通过txSelect开启事务之后，我们便可以发布消息给broker代理服务器了，如果txCommit提交成功了，则消息一定到达了broker了，如果在txCommit执行之前broker异常崩溃或者由于其他原因抛出异常，这个时候我们便可以捕获异常通过txRollback回滚事务了。<br>
+事务确实能够解决producer与broker之间消息确认的问题，只有消息成功被broker接受，事务提交才能成功，否则我们便可以在捕获异常进行事务回滚操作同时进行消息重发，但是使用事务机制的话会降低RabbitMQ的性能，那么有没有更好的方法既能保障producer知道消息已经正确送到，又能基本上不带来性能上的损失呢？从AMQP协议的层面看是没有更好的方法，但是RabbitMQ提供了一个更好的方案，即将channel信道设置成confirm模式。</p>
+<h3 id="Confirm模式">Confirm模式</h3>
+<p>上面我们介绍了RabbitMQ可能会遇到的一个问题，即生成者不知道消息是否真正到达broker，随后通过AMQP协议层面为我们提供了事务机制解决了这个问题，但是采用事务机制实现会降低RabbitMQ的消息吞吐量，那么有没有更加高效的解决方式呢？答案是采用Confirm模式。</p>
+<h4 id="生产者（producer）端confirm模式的实现原理">生产者（producer）端confirm模式的实现原理</h4>
+<p>生产者将信道设置成confirm模式，一旦信道进入confirm模式，所有在该信道上面发布的消息都会被指派一个唯一的ID(从1开始)，一旦消息被投递到所有匹配的队列之后，broker就会发送一个确认给生产者（包含消息的唯一ID）,这就使得生产者知道消息已经正确到达目的队列了，如果消息和队列是可持久化的，那么确认消息会将消息写入磁盘之后发出，broker回传给生产者的确认消息中deliver-tag域包含了确认消息的序列号，此外broker也可以设置basic.ack的multiple域，表示到这个序列号之前的所有消息都已经得到了处理。<br>
+confirm模式最大的好处在于它是异步的，一旦发布一条消息，生产者应用程序就可以在等信道返回确认的同时继续发送下一条消息，当消息最终得到确认之后，生产者应用便可以通过回调方法来处理该确认消息，如果RabbitMQ因为自身内部错误导致消息丢失，就会发送一条nack消息，生产者应用程序同样可以在回调方法中处理该nack消息。<br>
+在channel 被设置成 confirm 模式之后，所有被 publish 的后续消息都将被 confirm（即 ack） 或者被nack一次。但是没有对消息被 confirm 的快慢做任何保证，并且同一条消息不会既被 confirm又被nack 。</p>
+<h4 id="开启confirm模式的方法">开启confirm模式的方法</h4>
+<p>生产者通过调用channel的confirmSelect方法将channel设置为confirm模式，如果没有设置no-wait标志的话，broker会返回confirm.select-ok表示同意发送者将当前channel信道设置为confirm模式(从目前RabbitMQ最新版本3.6来看，如果调用了channel.confirmSelect方法，默认情况下是直接将no-wait设置成false的，也就是默认情况下broker是必须回传confirm.select-ok的)。<br>
+已经在transaction事务模式的channel是不能再设置成confirm模式的，即这两种模式是不能共存的。</p>
+<h3 id="编程模式">编程模式</h3>
+<p>对于固定消息体大小和线程数，如果消息持久化，生产者confirm(或者采用事务机制)，消费者ack那么对性能有很大的影响.<br>
+消息持久化的优化没有太好方法，用更好的物理存储（SAS, SSD, RAID卡）总会带来改善。生产者confirm这一环节的优化则主要在于客户端程序的优化之上。归纳起来，客户端实现生产者confirm有三种编程方式：<br>
+普通confirm模式：每发送一条消息后，调用waitForConfirms()方法，等待服务器端confirm。实际上是一种串行confirm了。<br>
+批量confirm模式：每发送一批消息后，调用waitForConfirms()方法，等待服务器端confirm。<br>
+异步confirm模式：提供一个回调方法，服务端confirm了一条或者多条消息后Client端会回调这个方法。<br>
+从编程实现的复杂度上来看：<br>
+第1种<br>
+普通confirm模式最简单，publish一条消息后，等待服务器端confirm,如果服务端返回false或者超时时间内未返回，客户端进行消息重传。<br>
+关键代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">channel.basicPublish(ConfirmConfig.exchangeName, ConfirmConfig.routingKey, MessageProperties.PERSISTENT_TEXT_PLAIN, ConfirmConfig.msg_10B.getBytes());</span><br><span class="line"><span class="keyword">if</span>(!channel.waitForConfirms())&#123;</span><br><span class="line">	System.out.println(<span class="string">"send message failed."</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第二种<br>
+批量confirm模式稍微复杂一点，客户端程序需要定期（每隔多少秒）或者定量（达到多少条）或者两则结合起来publish消息，然后等待服务器端confirm, 相比普通confirm模式，批量极大提升confirm效率，但是问题在于一旦出现confirm返回false或者超时的情况时，客户端需要将这一批次的消息全部重发，这会带来明显的重复消息数量，并且，当消息经常丢失时，批量confirm性能应该是不升反降的。<br>
+关键代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">channel.confirmSelect();</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;batchCount;i++)&#123;</span><br><span class="line">	channel.basicPublish(ConfirmConfig.exchangeName, ConfirmConfig.routingKey, MessageProperties.PERSISTENT_TEXT_PLAIN, ConfirmConfig.msg_10B.getBytes());</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span>(!channel.waitForConfirms())&#123;</span><br><span class="line">	System.out.println(<span class="string">"send message failed."</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第三种<br>
+异步confirm模式的编程实现最复杂，Channel对象提供的ConfirmListener()回调方法只包含deliveryTag（当前Chanel发出的消息序号），我们需要自己为每一个Channel维护一个unconfirm的消息序号集合，每publish一条数据，集合中元素加1，每回调一次handleAck方法，unconfirm集合删掉相应的一条（multiple=false）或多条（multiple=true）记录。从程序运行效率上看，这个unconfirm集合最好采用有序集合SortedSet存储结构。实际上，SDK中的waitForConfirms()方法也是通过SortedSet维护消息序号的。<br>
+关键代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">SortedSet&lt;Long&gt; confirmSet = Collections.synchronizedSortedSet(<span class="keyword">new</span> TreeSet&lt;Long&gt;());</span><br><span class="line"> channel.confirmSelect();</span><br><span class="line">        channel.addConfirmListener(<span class="keyword">new</span> ConfirmListener() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleAck</span><span class="params">(<span class="keyword">long</span> deliveryTag, <span class="keyword">boolean</span> multiple)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">                <span class="keyword">if</span> (multiple) &#123;</span><br><span class="line">                    confirmSet.headSet(deliveryTag + <span class="number">1</span>).clear();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    confirmSet.remove(deliveryTag);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleNack</span><span class="params">(<span class="keyword">long</span> deliveryTag, <span class="keyword">boolean</span> multiple)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">            	System.out.println(<span class="string">"Nack, SeqNo: "</span> + deliveryTag + <span class="string">", multiple: "</span> + multiple);</span><br><span class="line">                <span class="keyword">if</span> (multiple) &#123;</span><br><span class="line">                    confirmSet.headSet(deliveryTag + <span class="number">1</span>).clear();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    confirmSet.remove(deliveryTag);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">long</span> nextSeqNo = channel.getNextPublishSeqNo();</span><br><span class="line">            channel.basicPublish(ConfirmConfig.exchangeName, ConfirmConfig.routingKey, MessageProperties.PERSISTENT_TEXT_PLAIN, ConfirmConfig.msg_10B.getBytes());</span><br><span class="line">            confirmSet.add(nextSeqNo);</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="消息确认（Consumer端）">消息确认（Consumer端）</h3>
+<p>为了保证消息从队列可靠地到达消费者，RabbitMQ提供消息确认机制(message acknowledgment)。消费者在声明队列时，可以指定noAck参数，当noAck=false时，RabbitMQ会等待消费者显式发回ack信号后才从内存(和磁盘，如果是持久化消息的话)中移去消息。否则，RabbitMQ会在队列中消息被消费后立即删除它。<br>
+采用消息确认机制后，只要令noAck=false，消费者就有足够的时间处理消息(任务)，不用担心处理消息过程中消费者进程挂掉后消息丢失的问题，因为RabbitMQ会一直持有消息直到消费者显式调用basicAck为止。<br>
+当noAck=false时，对于RabbitMQ服务器端而言，队列中的消息分成了两部分：一部分是等待投递给消费者的消息；一部分是已经投递给消费者，但是还没有收到消费者ack信号的消息。如果服务器端一直没有收到消费者的ack信号，并且消费此消息的消费者已经断开连接，则服务器端会安排该消息重新进入队列，等待投递给下一个消费者（也可能还是原来的那个消费者）。<br>
+RabbitMQ不会为未ack的消息设置超时时间，它判断此消息是否需要重新投递给消费者的唯一依据是消费该消息的消费者连接是否已经断开。这么设计的原因是RabbitMQ允许消费者消费一条消息的时间可以很久很久。<br>
+RabbitMQ管理平台界面上可以看到当前队列中Ready状态和Unacknowledged状态的消息数，分别对应上文中的等待投递给消费者的消息数和已经投递给消费者但是未收到ack信号的消息数。<br>
+在Consumer中Confirm模式中分为手动确认和自动确认。</p>
+<p>手动确认主要并使用以下方法：</p>
+<p>basic.ack: 用于肯定确认，multiple参数用于多个消息确认。<br>
+basic.recover：是路由不成功的消息可以使用recovery重新发送到队列中。<br>
+basic.reject：是接收端告诉服务器这个消息我拒绝接收,不处理,可以设置是否放回到队列中还是丢掉，而且只能一次拒绝一个消息,官网中有明确说明不能批量拒绝消息，为解决批量拒绝消息才有了basicNack。<br>
+basic.nack：可以一次拒绝N条消息，客户端可以设置basicNack方法的multiple参数为true，服务器会拒绝指定了delivery_tag的所有未确认的消息(tag是一个64位的long值，最大值是9223372036854775807)。</p>
+<p>肯定的确认只是指导RabbitMQ将一个消息记录为已投递。basic.reject的否定确认具有相同的效果。 两者的差别在于：肯定的确认假设一个消息已经成功处理，而对立面则表示投递没有被处理，但仍然应该被删除。</p>
+<p>同样的Consumer中的Confirm模式也具有同时确认多个投递，通过将确认方法的 multiple “字段设置为true完成的，实现的意义与Producer的一致。</p>
+<p>在自动确认模式下，消息在发送后立即被认为是发送成功。 这种模式可以提高吞吐量（只要消费者能够跟上），不过会降低投递和消费者处理的安全性。 这种模式通常被称为“发后即忘”。 与手动确认模式不同，如果消费者的TCP连接或信道在成功投递之前关闭，该消息则会丢失。</p>
+<p>使用自动确认模式时需要考虑的另一件事是消费者过载。 手动确认模式通常与有限的信道预取一起使用，限制信道上未完成（“进行中”）传送的数量。 然而，对于自动确认，根据定义没有这样的限制。 因此，消费者可能会被交付速度所压倒，可能积压在内存中，堆积如山，或者被操作系统终止。 某些客户端库将应用TCP反压（直到未处理的交付积压下降超过一定的限制时才停止从套接字读取）。 因此，只建议当消费者可以有效且稳定地处理投递时才使用自动投递方式。<br>
+主要实现代码：</p>
+<p>// 手动确认消息<br>
+channel.basicAck(envelope.getDeliveryTag(), false);</p>
+<p>// 关闭自动确认<br>
+boolean autoAck = false;<br>
+channel.basicConsume(QUEUE_NAME, autoAck, consumer);</p>
+<p>2、关于Spring Boot使用Consumer的Confirm模式<br>
+请参考rabbitmq-demo中的CallBackSender.java和CheckReceiver.java的实现。</p>
+<h2 id="Message-durability-消息持久化">Message durability 消息持久化</h2>
 
     </div>
 
@@ -501,7 +580,7 @@ Kafka 0.8 以后，提供了 HA 机制，就是 replica（复制品） 副本机
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是消息队列"><span class="nav-number">1.</span> <span class="nav-text">什么是消息队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么使用消息队列"><span class="nav-number">2.</span> <span class="nav-text">为什么使用消息队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解耦"><span class="nav-number">2.1.</span> <span class="nav-text">* 解耦</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步"><span class="nav-number">2.2.</span> <span class="nav-text">* 异步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#削峰"><span class="nav-number">2.3.</span> <span class="nav-text">* 削峰</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主流的MQ，如：kafka、rabbitmq、rocketmq、activemq"><span class="nav-number">3.</span> <span class="nav-text">主流的MQ，如：kafka、rabbitmq、rocketmq、activemq</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列的缺点"><span class="nav-number">4.</span> <span class="nav-text">消息队列的缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ重要组件"><span class="nav-number">5.</span> <span class="nav-text">RabbitMQ重要组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Direct-Exchange"><span class="nav-number">5.0.1.</span> <span class="nav-text">Direct Exchange</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Fanout-Exchange"><span class="nav-number">5.0.2.</span> <span class="nav-text">Fanout Exchange</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Topic-Exchange"><span class="nav-number">5.0.3.</span> <span class="nav-text">Topic Exchange</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息交换器"><span class="nav-number">6.</span> <span class="nav-text">消息交换器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMq的高可用性"><span class="nav-number">7.</span> <span class="nav-text">RabbitMq的高可用性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单机模式"><span class="nav-number">7.1.</span> <span class="nav-text">单机模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#普通集群模式（无高可用性）"><span class="nav-number">7.2.</span> <span class="nav-text">普通集群模式（无高可用性）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#镜像集群模式（高可用性）"><span class="nav-number">7.3.</span> <span class="nav-text">镜像集群模式（高可用性）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka-的高可用性"><span class="nav-number">8.</span> <span class="nav-text">Kafka 的高可用性</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是消息队列"><span class="nav-number">1.</span> <span class="nav-text">什么是消息队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么使用消息队列"><span class="nav-number">2.</span> <span class="nav-text">为什么使用消息队列</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用解耦"><span class="nav-number">2.1.</span> <span class="nav-text">* 应用解耦</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步处理"><span class="nav-number">2.2.</span> <span class="nav-text">* 异步处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流量削峰"><span class="nav-number">2.3.</span> <span class="nav-text">* 流量削峰</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主流的MQ，如：kafka、rabbitmq、rocketmq、activemq"><span class="nav-number">3.</span> <span class="nav-text">主流的MQ，如：kafka、rabbitmq、rocketmq、activemq</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息队列的缺点"><span class="nav-number">4.</span> <span class="nav-text">消息队列的缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ重要组件"><span class="nav-number">5.</span> <span class="nav-text">RabbitMQ重要组件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Direct-Exchange"><span class="nav-number">5.0.1.</span> <span class="nav-text">Direct Exchange</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Fanout-Exchange"><span class="nav-number">5.0.2.</span> <span class="nav-text">Fanout Exchange</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Topic-Exchange"><span class="nav-number">5.0.3.</span> <span class="nav-text">Topic Exchange</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息交换器"><span class="nav-number">6.</span> <span class="nav-text">消息交换器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMq的高可用性"><span class="nav-number">7.</span> <span class="nav-text">RabbitMq的高可用性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单机模式"><span class="nav-number">7.1.</span> <span class="nav-text">单机模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#普通集群模式（无高可用性）"><span class="nav-number">7.2.</span> <span class="nav-text">普通集群模式（无高可用性）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#镜像集群模式（高可用性）"><span class="nav-number">7.3.</span> <span class="nav-text">镜像集群模式（高可用性）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#添加策略模式有两种方式"><span class="nav-number">7.3.1.</span> <span class="nav-text">添加策略模式有两种方式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#管理页面添加"><span class="nav-number">7.3.1.1.</span> <span class="nav-text">管理页面添加</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#通过命令方式添加"><span class="nav-number">7.3.1.2.</span> <span class="nav-text">通过命令方式添加</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kafka-的高可用性"><span class="nav-number">8.</span> <span class="nav-text">Kafka 的高可用性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何确保消息的可靠性传输（消息不被丢失）？"><span class="nav-number">9.</span> <span class="nav-text">如何确保消息的可靠性传输（消息不被丢失）？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#事务机制"><span class="nav-number">9.1.</span> <span class="nav-text">事务机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Confirm模式"><span class="nav-number">9.2.</span> <span class="nav-text">Confirm模式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#生产者（producer）端confirm模式的实现原理"><span class="nav-number">9.2.1.</span> <span class="nav-text">生产者（producer）端confirm模式的实现原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开启confirm模式的方法"><span class="nav-number">9.2.2.</span> <span class="nav-text">开启confirm模式的方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程模式"><span class="nav-number">9.3.</span> <span class="nav-text">编程模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息确认（Consumer端）"><span class="nav-number">9.4.</span> <span class="nav-text">消息确认（Consumer端）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Message-durability-消息持久化"><span class="nav-number">10.</span> <span class="nav-text">Message durability 消息持久化</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -517,7 +596,7 @@ Kafka 0.8 以后，提供了 HA 机制，就是 replica（复制品） 副本机
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">36</span>
+          <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -595,7 +674,7 @@ Kafka 0.8 以后，提供了 HA 机制，就是 replica（复制品） 副本机
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
