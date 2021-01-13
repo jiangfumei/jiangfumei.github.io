@@ -585,7 +585,16 @@ oauth2同意画面<br>
 <img src="/images/googlepay08.png" alt=""><br>
 6.下载oauth2客户端json或进入管理账户下载账户的secret.json或p12文件<br>
 <img src="/images/googlepay09.png" alt=""><br>
-基本的控制台设置流程就是这了，接下来再看代码部分：</p>
+基本的控制台设置流程就是这了,然后再获取authorization_code,refresh_token，具体流程操作附上我的文章参考链接<a href="https://blog.csdn.net/liaodehong/article/details/83274207" target="_blank" rel="noopener">Java处理谷歌支付</a>，为防止原文作者删除，我再次附上我的操作步骤：</p>
+<ol>
+<li>获取authorization_code<br>
+get请求，浏览器地址栏输入https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/androidpublisher&amp;response_type=code&amp;access_type=offline&amp;redirect_uri=http://域名/oauth2callback&amp;client_id={替换掉自己应用的client_id}，回车之后会让你登录谷歌开发者账号，选择账户之后地址栏显示如下，复制保存好地址栏code参数<br>
+<img src="/images/googlecode.png" alt=""></li>
+<li>获取refresh_token<br>
+post请求 <a href="https://accounts.google.com/o/oauth2/token" target="_blank" rel="noopener">https://accounts.google.com/o/oauth2/token</a><br>
+<img src="/images/google_refreshToken.png" alt=""><br>
+接下来再看代码部分：</li>
+</ol>
 <h2 id="代码部分">代码部分</h2>
 <p>1.先在application.yml配置google账号的信息，如下图<br>
 <img src="/images/googlepay10.png" alt=""><br>
